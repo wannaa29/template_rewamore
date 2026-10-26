@@ -1,0 +1,10 @@
+.env
+.venv
+var/*
+__pycache__
+*.pyc
+.git
+qa-artifacts
+
+node_modules/
+backups/

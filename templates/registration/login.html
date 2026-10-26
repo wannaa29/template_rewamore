@@ -1,0 +1,11 @@
+{% load static %}<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Masuk ke studio | Rewamore</title><link rel="stylesheet" href="{% static 'studio/studio.css' %}"><script src="{% static 'studio/studio.js' %}" defer></script></head><body>
+<main class="login-page">
+  <div class="login-visual"><img src="{% static 'themes/1/assets/IMG_20260822_120640.jpg' %}" alt="" width="1200" height="1600"><div class="login-visual-content"><h2>Merangkai cerita.<br>Merayakan cinta.</h2><p>Undangan yang menyimpan kisah, menghadirkan rasa, dan mendekatkan orang-orang tersayang.</p></div></div>
+  <div class="login-main"><a class="wordmark" href="{% url 'invitations:dashboard' %}">rewamore<small>Invitation studio</small></a><div class="login-form-wrap"><span class="eyebrow">Selamat datang kembali</span><h1>Masuk ke studio.</h1><p>Lanjutkan merancang undangan untuk cerita berikutnya.</p>
+    {% if form.errors %}<div class="alert alert-danger" role="alert">Nama pengguna atau kata sandi belum sesuai. Silakan periksa kembali.</div>{% endif %}
+    {% if next and user.is_authenticated %}<div class="alert alert-danger">Akun Anda belum memiliki akses ke halaman tersebut.</div>{% endif %}
+    <form method="post">{% csrf_token %}<input type="hidden" name="next" value="{{ next }}"><div class="form-field"><label for="id_username">Nama pengguna</label><input id="id_username" type="text" name="username" value="{{ form.username.value|default:'' }}" required autocomplete="username" autofocus></div><div class="form-field"><label for="id_password">Kata sandi</label><input id="id_password" type="password" name="password" required autocomplete="current-password"></div><button type="submit" class="button button-wide">Masuk ke studio</button></form><p class="login-note">Akun dikelola oleh administrator. Hubungi pengelola apabila Anda memerlukan akun atau bantuan akses.</p>
+  </div><div class="login-footer">Rewamore Invitation Studio. Ruang untuk setiap cerita istimewa.</div></div>
+</main>
+</body></html>

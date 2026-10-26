@@ -1,0 +1,32 @@
+{% extends 'studio/base.html' %}{% load static %}
+{% block title %}Undangan saya{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div><span class="eyebrow">Ruang cerita Anda</span><h1>Undangan saya</h1><p>Kelola setiap cerita, dari sentuhan pertama hingga siap dibagikan.</p></div>
+  <a class="button" href="{% url 'invitations:themes' %}"><span aria-hidden="true">+</span> Buat undangan</a>
+</div>
+<div class="stats" aria-label="Ringkasan undangan">
+  <div class="stat"><span class="stat-label">Semua undangan</span><span class="stat-number">{{ stats.total|default:0 }}</span><span class="stat-context">undangan</span></div>
+  <div class="stat"><span class="stat-label">Sudah terbit</span><span class="stat-number">{{ stats.published|default:0 }}</span><span class="stat-context">siap dibagikan</span></div>
+  <div class="stat"><span class="stat-label">Dalam pengerjaan</span><span class="stat-number">{{ stats.draft|default:0 }}</span><span class="stat-context">draf tersimpan</span></div>
+  <div class="stat"><span class="stat-label">Tamu undangan</span><span class="stat-number">{{ stats.guests|default:0 }}</span><span class="stat-context">penerima tautan</span></div>
+</div>
+<div class="section-header"><h2>Koleksi undangan</h2><p>{{ stats.total|default:0 }} undangan</p></div>
+<div class="invitation-grid">
+{% for invitation in invitations %}
+  <article class="invitation-card">
+    <a class="invitation-photo" href="{% url 'invitations:edit' invitation.pk %}" aria-label="Edit undangan {{ invitation.title }}" style="display:block">
+      {% if invitation.theme.preview_image %}<img src="{{ invitation.theme.preview_image }}" alt="Tema {{ invitation.theme.name }}" loading="lazy" width="600" height="420">{% else %}<div class="invitation-photo-empty" aria-hidden="true">{{ invitation.groom_name|first }} &amp; {{ invitation.bride_name|first }}</div>{% endif %}
+    </a>
+    <div class="card-body">
+      <div class="card-topline"><span class="template-label">{{ invitation.theme.name }}</span><span class="badge {% if invitation.status == 'published' %}published{% endif %}">{% if invitation.status == 'published' %}Sudah terbit{% else %}Draf{% endif %}</span></div>
+      <h3><a href="{% url 'invitations:edit' invitation.pk %}">{{ invitation.title }}</a></h3>
+      <p class="card-detail">{% if invitation.event_date %}{{ invitation.event_date|date:'j F Y' }}<span aria-hidden="true"> · </span>{% endif %}{{ invitation.guest_count }} tamu <span aria-hidden="true"> · </span> /{{ invitation.slug }}/</p>
+      <div class="card-actions"><a class="button button-secondary button-small" href="{% url 'invitations:edit' invitation.pk %}">Edit undangan</a><a class="button button-quiet button-small" href="{% url 'invitations:guests' invitation.pk %}">Kelola tamu</a></div>
+    </div>
+  </article>
+{% endfor %}
+<a class="create-card" href="{% url 'invitations:themes' %}"><span class="create-mark" aria-hidden="true">+</span><h3>Mulai cerita baru</h3><p>Pilih tema, isi detail pasangan, dan jadikan undangan milik mereka.</p><span class="button button-secondary button-small">Jelajahi tema</span></a>
+</div>
+<div class="workflow-note"><div><b>01. Pilih tema</b>Mulai dari desain yang paling dekat dengan cerita pasangan.</div><div><b>02. Sesuaikan setiap bagian</b>Edit foto, teks, acara, hingga kata penutup dari satu studio.</div><div><b>03. Bagikan secara personal</b>Tambahkan tamu untuk membuat tautan dengan nama penerima.</div></div>
+{% endblock %}

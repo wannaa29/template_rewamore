@@ -1,0 +1,14 @@
+[
+  {
+    "font": "cormorantgaramond",
+    "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/cormorantgaramond/OFL.txt",
+    "file": "cormorantgaramond-OFL.txt",
+    "bytes": 4387
+  },
+  {
+    "font": "dmsans",
+    "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/dmsans/OFL.txt",
+    "file": "dmsans-OFL.txt",
+    "bytes": 4482
+  }
+]

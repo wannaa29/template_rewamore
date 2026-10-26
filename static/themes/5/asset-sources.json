@@ -1,0 +1,327 @@
+{
+  "reference": "https://hallomoment.my.id/endah-dan-evan/?to=Iin+%2526+riswan",
+  "retrievedAt": "2026-10-14",
+  "assets": [
+    {
+      "role": "couple-main",
+      "source": "https://hallomoment.my.id/wp-content/uploads/jet-form-builder/54d4cda5a907f7d4dd75662ab0199318/2026/09/ChatGPT-Image-Sep-4-2026-06_23_13-PM1.png",
+      "originalDimensions": [
+        1254,
+        1254
+      ],
+      "sourceCredit": "Hallomoment / Endah dan Evan invitation supplied as reference by user",
+      "sourceFileSha256": "c74d983a44c49cf7769c75c15181fea635cf7865860565b793493047d6b80ef3",
+      "transformation": "Resized to responsive widths and encoded WebP; original appearance and transparency preserved.",
+      "variants": [
+        {
+          "path": "img/couple-main-480.webp",
+          "width": 480,
+          "height": 480,
+          "bytes": 42144
+        },
+        {
+          "path": "img/couple-main-960.webp",
+          "width": 960,
+          "height": 960,
+          "bytes": 122696
+        },
+        {
+          "path": "img/couple-main-1254.webp",
+          "width": 1254,
+          "height": 1254,
+          "bytes": 189122
+        }
+      ]
+    },
+    {
+      "role": "bride",
+      "source": "https://hallomoment.my.id/wp-content/uploads/jet-form-builder/148f6fe449dc406dd6eaf81d66d20914/2026/09/ChatGPT-Image-Sep-4-2026-06_20_12-PM1.png",
+      "originalDimensions": [
+        1254,
+        1254
+      ],
+      "sourceCredit": "Hallomoment / Endah dan Evan invitation supplied as reference by user",
+      "sourceFileSha256": "da948154b013f8b08839860e1986fec7aaa78648c0f32216803a9381e1d5e0a4",
+      "transformation": "Resized to responsive widths and encoded WebP; original appearance and transparency preserved.",
+      "variants": [
+        {
+          "path": "img/bride-480.webp",
+          "width": 480,
+          "height": 480,
+          "bytes": 39748
+        },
+        {
+          "path": "img/bride-960.webp",
+          "width": 960,
+          "height": 960,
+          "bytes": 111592
+        }
+      ]
+    },
+    {
+      "role": "groom",
+      "source": "https://hallomoment.my.id/wp-content/uploads/jet-form-builder/80682de3bf05ac326350ffbc4945a420/2026/09/ChatGPT-Image-Sep-4-2026-06_20_22-PM1.png",
+      "originalDimensions": [
+        1254,
+        1254
+      ],
+      "sourceCredit": "Hallomoment / Endah dan Evan invitation supplied as reference by user",
+      "sourceFileSha256": "e977afe07d6b2522b3f53f61b331e45890e09868cb1030e7a66e49d3d6b62d60",
+      "transformation": "Resized to responsive widths and encoded WebP; original appearance and transparency preserved.",
+      "variants": [
+        {
+          "path": "img/groom-480.webp",
+          "width": 480,
+          "height": 480,
+          "bytes": 28676
+        },
+        {
+          "path": "img/groom-960.webp",
+          "width": 960,
+          "height": 960,
+          "bytes": 71962
+        }
+      ]
+    },
+    {
+      "role": "couple-close",
+      "source": "https://hallomoment.my.id/wp-content/uploads/jet-form-builder/54d4cda5a907f7d4dd75662ab0199318/2026/09/ChatGPT-Image-Sep-4-2026-06_24_24-PM1-1.png",
+      "originalDimensions": [
+        1254,
+        1254
+      ],
+      "sourceCredit": "Hallomoment / Endah dan Evan invitation supplied as reference by user",
+      "sourceFileSha256": "ab43b9e08ce1f0419650f0c001789b93144d59d802bdda9c68e0ad6ede7fe9f0",
+      "transformation": "Resized to responsive widths and encoded WebP; original appearance and transparency preserved.",
+      "variants": [
+        {
+          "path": "img/couple-close-480.webp",
+          "width": 480,
+          "height": 480,
+          "bytes": 43636
+        },
+        {
+          "path": "img/couple-close-960.webp",
+          "width": 960,
+          "height": 960,
+          "bytes": 118018
+        },
+        {
+          "path": "img/couple-close-1254.webp",
+          "width": 1254,
+          "height": 1254,
+          "bytes": 174220
+        }
+      ]
+    },
+    {
+      "role": "couple-seated",
+      "source": "https://hallomoment.my.id/wp-content/uploads/jet-form-builder/54d4cda5a907f7d4dd75662ab0199318/2026/09/ChatGPT-Image-Sep-4-2026-06_27_53-PM1-1.png",
+      "originalDimensions": [
+        1254,
+        1254
+      ],
+      "sourceCredit": "Hallomoment / Endah dan Evan invitation supplied as reference by user",
+      "sourceFileSha256": "c5f2adbe1fa716d1ff0beed8d3d1898097151948b9c79bec3569bf99914f4051",
+      "transformation": "Resized to responsive widths and encoded WebP; original appearance and transparency preserved.",
+      "variants": [
+        {
+          "path": "img/couple-seated-480.webp",
+          "width": 480,
+          "height": 480,
+          "bytes": 46540
+        },
+        {
+          "path": "img/couple-seated-960.webp",
+          "width": 960,
+          "height": 960,
+          "bytes": 130152
+        },
+        {
+          "path": "img/couple-seated-1254.webp",
+          "width": 1254,
+          "height": 1254,
+          "bytes": 195116
+        }
+      ]
+    },
+    {
+      "role": "couple-portrait",
+      "source": "https://hallomoment.my.id/wp-content/uploads/jet-form-builder/0102d6b30badc91266a51a24e8203c7d/2026/09/ChatGPT-Image-Sep-4-2026-06_23_13-PM11.png",
+      "originalDimensions": [
+        1254,
+        1254
+      ],
+      "sourceCredit": "Hallomoment / Endah dan Evan invitation supplied as reference by user",
+      "sourceFileSha256": "c7d64a7ae6a7b2d08d19f6cf4fa88df91df3520febd6a2588a53c3926aaa9756",
+      "transformation": "Resized to responsive widths and encoded WebP; original appearance and transparency preserved.",
+      "variants": [
+        {
+          "path": "img/couple-portrait-480.webp",
+          "width": 480,
+          "height": 480,
+          "bytes": 41350
+        },
+        {
+          "path": "img/couple-portrait-960.webp",
+          "width": 960,
+          "height": 960,
+          "bytes": 125690
+        },
+        {
+          "path": "img/couple-portrait-1254.webp",
+          "width": 1254,
+          "height": 1254,
+          "bytes": 214958
+        }
+      ]
+    },
+    {
+      "role": "gold brush separator",
+      "source": "https://hallomoment.my.id/wp-content/uploads/2025/11/list-o6.webp",
+      "path": "img/gold-brush.webp",
+      "width": 235,
+      "height": 22,
+      "transformation": "Original source file, unchanged"
+    },
+    {
+      "role": "white feather texture",
+      "source": "https://hallomoment.my.id/wp-content/uploads/2025/11/bg_bulu_white.webp",
+      "path": "img/white-feathers.webp",
+      "width": 720,
+      "height": 480,
+      "transformation": "Original source file, unchanged"
+    },
+    {
+      "role": "soft leaf texture",
+      "source": "https://hallomoment.my.id/wp-content/uploads/2025/11/bgbio.webp",
+      "path": "img/white-leaves.webp",
+      "width": 509,
+      "height": 339,
+      "transformation": "Original source file, unchanged"
+    },
+    {
+      "role": "quilt gift card texture",
+      "source": "https://hallomoment.my.id/wp-content/uploads/2026/04/bgatm-1.webp",
+      "path": "img/gift-texture.webp",
+      "width": 612,
+      "height": 448,
+      "transformation": "Original source file, unchanged"
+    },
+    {
+      "role": "bank logo",
+      "source": "https://nos.wjv-1.neo.id/strg-tl1/logobank/bni.png",
+      "path": "img/bank-bni.webp",
+      "width": 240,
+      "height": 78,
+      "transformation": "Proportional resize and WebP encoding"
+    },
+    {
+      "role": "bank logo",
+      "source": "https://nos.wjv-1.neo.id/strg-tl1/logobank/bri.png",
+      "path": "img/bank-bri.webp",
+      "width": 240,
+      "height": 57,
+      "transformation": "Proportional resize and WebP encoding"
+    },
+    {
+      "role": "bank logo",
+      "source": "https://nos.wjv-1.neo.id/strg-tl1/logobank/logo_mandiri.png",
+      "path": "img/bank-mandiri.webp",
+      "width": 240,
+      "height": 70,
+      "transformation": "Proportional resize and WebP encoding"
+    },
+    {
+      "role": "background music",
+      "source": "https://hallomoment.my.id/wp-content/uploads/user/85/30176/30176LCqCRxoh.mp3",
+      "path": "audio/wedding-theme.mp3",
+      "titleFromFileMetadata": "ARVIAN DWI | SATU SHAF DIBELAKANGKU",
+      "artistFromFileMetadata": "Arvian Musik",
+      "durationSeconds": 364.248,
+      "bytes": 2550066,
+      "transformation": "Original source file, unchanged",
+      "rights": "Rights remain with their respective owners; copied from user-supplied reference, no license transfer implied."
+    },
+    {
+      "role": "local typeface",
+      "family": "Italiana",
+      "weight": 400,
+      "source": "https://fonts.gstatic.com/s/italiana/v21/QldNNTtLsx4E__B0XTmR.ttf",
+      "path": "fonts/italiana-regular.woff",
+      "license": "fonts/italiana-OFL.txt",
+      "transformation": "Lossless WOFF font packaging from original Google Fonts TTF",
+      "bytes": 14124
+    },
+    {
+      "role": "local typeface",
+      "family": "Poppins",
+      "weight": 400,
+      "source": "https://fonts.gstatic.com/s/poppins/v24/pxiEyp8kv8JHgFVrFJA.ttf",
+      "path": "fonts/poppins-regular.woff",
+      "license": "fonts/poppins-OFL.txt",
+      "transformation": "Lossless WOFF font packaging from original Google Fonts TTF",
+      "bytes": 69008
+    },
+    {
+      "role": "local typeface",
+      "family": "Poppins",
+      "weight": 500,
+      "source": "https://fonts.gstatic.com/s/poppins/v24/pxiByp8kv8JHgFVrLGT9V1s.ttf",
+      "path": "fonts/poppins-medium.woff",
+      "license": "fonts/poppins-OFL.txt",
+      "transformation": "Lossless WOFF font packaging from original Google Fonts TTF",
+      "bytes": 68252
+    },
+    {
+      "role": "local typeface",
+      "family": "Poppins",
+      "weight": 600,
+      "source": "https://fonts.gstatic.com/s/poppins/v24/pxiByp8kv8JHgFVrLEj6V1s.ttf",
+      "path": "fonts/poppins-semibold.woff",
+      "license": "fonts/poppins-OFL.txt",
+      "transformation": "Lossless WOFF font packaging from original Google Fonts TTF",
+      "bytes": 68708
+    },
+    {
+      "role": "local typeface",
+      "family": "Cormorant Infant",
+      "weight": 400,
+      "source": "https://fonts.gstatic.com/s/cormorantinfant/v22/HhyCU44g9vKiM1sORYSiWeAsLN99xfs9KOOc_agJPrgvYOWT.ttf",
+      "path": "fonts/cormorant-infant-regular.woff",
+      "license": "fonts/cormorant-infant-OFL.txt",
+      "transformation": "Lossless WOFF font packaging from original Google Fonts TTF",
+      "bytes": 88004
+    },
+    {
+      "role": "local typeface",
+      "family": "Cormorant Infant",
+      "weight": 500,
+      "source": "https://fonts.gstatic.com/s/cormorantinfant/v22/HhyCU44g9vKiM1sORYSiWeAsLN99xfs9KOOc_agJPrgdYOWT.ttf",
+      "path": "fonts/cormorant-infant-medium.woff",
+      "license": "fonts/cormorant-infant-OFL.txt",
+      "transformation": "Lossless WOFF font packaging from original Google Fonts TTF",
+      "bytes": 88724
+    },
+    {
+      "role": "local typeface",
+      "family": "Cormorant Infant",
+      "weight": 600,
+      "source": "https://fonts.gstatic.com/s/cormorantinfant/v22/HhyCU44g9vKiM1sORYSiWeAsLN99xfs9KOOc_agJPrjxZ-WT.ttf",
+      "path": "fonts/cormorant-infant-semibold.woff",
+      "license": "fonts/cormorant-infant-OFL.txt",
+      "transformation": "Lossless WOFF font packaging from original Google Fonts TTF",
+      "bytes": 88992
+    },
+    {
+      "role": "local typeface",
+      "family": "Mrs Saint Delafield",
+      "weight": 400,
+      "source": "https://fonts.gstatic.com/s/mrssaintdelafield/v14/v6-IGZDIOVXH9xtmTZfRagunqBw5WC62cK4.ttf",
+      "path": "fonts/mrs-saint-delafield-regular.woff",
+      "license": "fonts/mrs-saint-delafield-OFL.txt",
+      "transformation": "Lossless WOFF font packaging from original Google Fonts TTF",
+      "bytes": 25752
+    }
+  ]
+}

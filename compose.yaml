@@ -1,0 +1,56 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: rewamore
+      POSTGRES_USER: rewamore
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rewamore -d rewamore"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+  web:
+    build: .
+    env_file: .env
+    environment:
+      DEBUG: "False"
+      DATABASE_URL: postgresql://rewamore:${POSTGRES_PASSWORD}@db:5432/rewamore
+      TRUST_PROXY: "True"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - media_data:/app/var/media
+      - static_data:/app/var/static
+      - cache_data:/app/var/cache
+    expose:
+      - "8000"
+    restart: unless-stopped
+  caddy:
+    image: caddy:2-alpine
+    environment:
+      DOMAIN: ${DOMAIN:?Set DOMAIN in .env}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - static_data:/srv/static:ro
+      - media_data:/srv/media:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+    restart: unless-stopped
+volumes:
+  pg_data:
+  media_data:
+  static_data:
+  cache_data:
+  caddy_data:
+  caddy_config:

@@ -1,0 +1,143 @@
+/* Navigation revision: one hamburger menu at every viewport width. */
+.invitation-menu-toggle {
+  position: fixed;
+  top: 31px;
+  right: max(25px, env(safe-area-inset-right));
+  z-index: 32;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  padding: 10px;
+  border: 1px solid #c4a1a7;
+  border-radius: 50%;
+  color: var(--paper);
+  background: #3d1824ed;
+  box-shadow: 0 4px 18px #200a1a22;
+  backdrop-filter: blur(12px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .35s, background .2s, visibility .35s;
+}
+body.opened .invitation-menu-toggle { opacity: 1; visibility: visible; }
+.invitation-menu-toggle:hover { background: var(--wine-light); }
+.burger-lines { display: grid; gap: 6px; }
+.burger-lines i { display: block; height: 1px; width: 17px; background: currentColor; transition: transform .25s; }
+.invitation-menu-toggle:hover .burger-lines i:first-child { transform: translateX(2px); }
+.invitation-menu-toggle:hover .burger-lines i:last-child { transform: translateX(-2px); }
+.hero-header { padding-right: calc(4.6% + 62px); }
+.invitation-menu {
+  position: fixed;
+  inset: 0 0 0 auto;
+  margin: 0 0 0 auto;
+  width: min(490px, 94vw);
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  padding: 28px 38px max(28px, env(safe-area-inset-bottom));
+  color: var(--wine);
+  background: var(--paper);
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+.invitation-menu::backdrop { background: #170d168c; backdrop-filter: blur(8px); }
+.invitation-menu[open] { animation: invitationMenuIn .5s var(--ease) both; }
+.invitation-menu-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 34px; }
+.menu-monogram { font: 36px/1 var(--serif); letter-spacing: -.06em; }
+.menu-monogram em { color: #a57479; font-size: .7em; }
+.menu-close { width: 40px; height: 40px; color: var(--wine); border: 1px solid var(--line); border-radius: 50%; }
+.menu-close:hover { color: var(--paper); background: var(--wine); }
+.invitation-menu > .eyebrow { font-size: 8px; letter-spacing: .18em; color: var(--muted); margin-bottom: 12px; }
+.invitation-menu h2 { font-size: 54px; margin: 0 0 25px; }
+.invitation-menu h2 em { color: #9c6d76; }
+#invitationNavigation { display: grid; }
+#invitationNavigation a {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  min-height: 58px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+  font: 31px/1.2 var(--serif);
+  transition: padding-left .3s var(--ease), color .2s;
+}
+#invitationNavigation a:hover, #invitationNavigation a[aria-current] { padding-left: 7px; color: #985665; }
+#invitationNavigation .menu-number { font: 8px/1 var(--sans); letter-spacing: .1em; color: #9c6d76; }
+#invitationNavigation .icon { width: 17px; height: 17px; margin-left: auto; flex-shrink: 0; opacity: .65; }
+.menu-date { border-top: 0; margin: 30px 0 0; font-size: 8px; letter-spacing: .12em; color: var(--muted); }
+.menu-date span { display: block; margin-top: 5px; font-size: 7px; }
+@keyframes invitationMenuIn { from { opacity: .5; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }
+
+/* Three small vertical controls; labels appear only on hover/keyboard focus. */
+body .experience-controls,
+body.motion-paused:not(.opened) .experience-controls {
+  position: fixed;
+  top: auto;
+  right: max(15px, env(safe-area-inset-right));
+  bottom: max(18px, env(safe-area-inset-bottom));
+  left: auto;
+  z-index: 31;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+.experience-controls .utility-button,
+.experience-controls .motion-button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  min-height: 36px;
+  padding: 8px;
+  gap: 0;
+  border-radius: 50%;
+  border-color: #bc989f;
+}
+.experience-controls .utility-button .icon { width: 15px; height: 15px; }
+.experience-controls .utility-button:disabled { opacity: .45; cursor: default; }
+.experience-controls .utility-button[aria-pressed=true] { border-color: var(--champagne); background: #653142; }
+.experience-controls .utility-button .control-label {
+  position: absolute;
+  display: block;
+  right: 45px;
+  top: 50%;
+  margin: 0;
+  padding: 5px 10px;
+  width: max-content;
+  max-width: 180px;
+  border: 1px solid #a07980;
+  border-radius: 4px;
+  background: var(--wine);
+  color: var(--paper);
+  font: 9px/1.5 var(--sans);
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(4px, -50%);
+  transition: opacity .2s, transform .2s;
+}
+.experience-controls #musicLabel, .experience-controls #motionLabel, .experience-controls #autoScrollLabel { display: block; }
+.experience-controls .utility-button:hover .control-label,
+.experience-controls .utility-button:focus-visible .control-label { opacity: 1; transform: translate(0, -50%); }
+.experience-controls .motion-dot { width: 11px; height: 11px; }
+.experience-controls .motion-dot::after { top: 2.5px; left: 2.5px; }
+.music-status-dot { position: absolute; top: 6px; right: 6px; width: 3px; height: 3px; border-radius: 50%; background: var(--champagne); opacity: 0; }
+.is-playing .music-status-dot { opacity: 1; }
+@media(max-width:700px) {
+  .invitation-menu-toggle { top: 22px; right: 17px; width: 38px; height: 38px; }
+  .hero-header { padding-right: 75px; }
+  .invitation-menu { padding: 23px 26px max(26px, env(safe-area-inset-bottom)); }
+  .invitation-menu-head { margin-bottom: 28px; }
+  .invitation-menu h2 { font-size: 46px; margin-bottom: 23px; }
+  #invitationNavigation a { font-size: 28px; min-height: 54px; gap: 16px; }
+  body .experience-controls, body.motion-paused:not(.opened) .experience-controls { right: 11px; bottom: max(15px, env(safe-area-inset-bottom)); gap: 5px; }
+  .experience-controls .utility-button, .experience-controls .motion-button { width: 34px; min-width: 34px; height: 34px; min-height: 34px; }
+  .experience-controls .utility-button .icon { width: 15px; height: 15px; }
+}
+@media(prefers-reduced-motion:reduce) { .invitation-menu[open] { animation: none; } }
+@media print { .invitation-menu-toggle, .invitation-menu, body .experience-controls { display: none !important; } }

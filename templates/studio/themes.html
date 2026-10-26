@@ -1,0 +1,13 @@
+{% extends 'studio/base.html' %}{% load static %}
+{% block title %}Koleksi tema{% endblock %}{% block breadcrumb %}Koleksi tema{% endblock %}
+{% block content %}
+<div class="page-heading"><div><span class="eyebrow">Temukan nuansa yang tepat</span><h1>Satu cerita, banyak pilihan.</h1><p>Seluruh tema dapat disesuaikan. Lihat desain lengkap, lalu mulai dengan tema pilihan Anda.</p></div><span class="muted small">{{ themes|length }} tema tersedia</span></div>
+<div class="theme-grid">
+{% for theme in themes %}
+  <article class="theme-card">
+    <a href="{% url 'invitations:theme_preview' theme.slug %}" target="_blank" rel="noopener" class="theme-art" style="display:block" aria-label="Pratinjau tema {{ theme.name }} di tab baru">{% if theme.preview_image %}<img src="{{ theme.preview_image }}" alt="Contoh foto tema {{ theme.name }}" loading="lazy" width="600" height="720">{% else %}<div class="invitation-photo-empty">{{ theme.name }}</div>{% endif %}</a>
+    <div class="theme-caption"><span class="small">Tema {{ theme.slug }}</span><h2>{{ theme.name }}</h2><p>{{ theme.description|default:'Desain undangan dengan foto, teks, dan bagian yang dapat dipersonalisasi.' }}</p><div class="actions"><a class="button button-small" href="{% url 'invitations:create' theme.slug %}">Gunakan tema</a><a class="button button-quiet button-small" href="{% url 'invitations:theme_preview' theme.slug %}" target="_blank" rel="noopener">Lihat desain <span aria-hidden="true">↗</span></a></div></div>
+  </article>
+{% empty %}<div class="empty-state"><h2>Koleksi belum tersedia</h2><p>Tema belum diimpor. Hubungi administrator untuk memuat koleksi undangan.</p></div>{% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% load static %}<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#365943">
+  <title>{% block title %}Studio Undangan{% endblock %} | Rewamore</title>
+  <link rel="stylesheet" href="{% static 'studio/studio.css' %}">
+  <script src="{% static 'studio/studio.js' %}" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Langsung ke konten</a>
+<div class="app-shell">
+  <aside class="sidebar" aria-label="Navigasi studio">
+    <a class="wordmark" href="{% url 'invitations:dashboard' %}">rewamore<small>Invitation studio</small></a>
+    <p class="sidebar-label">Ruang kerja</p>
+    <nav class="sidebar-nav">
+      <a href="{% url 'invitations:dashboard' %}" class="{% if request.resolver_match.url_name != 'themes' and request.resolver_match.url_name != 'create' %}active{% endif %}"><span class="nav-index">01</span> Undangan saya</a>
+      <a href="{% url 'invitations:themes' %}" class="{% if request.resolver_match.url_name == 'themes' or request.resolver_match.url_name == 'create' %}active{% endif %}"><span class="nav-index">02</span> Koleksi tema</a>
+      {% if request.user.is_staff %}<a href="{% url 'admin:index' %}"><span class="nav-index">03</span> Administrasi</a>{% endif %}
+    </nav>
+    <div class="sidebar-note"><strong>Setiap cerita layak dirayakan.</strong>Rancang undangan personal, lalu bagikan kepada orang-orang terdekat.</div>
+    <div class="account">
+      <span class="avatar" aria-hidden="true">{{ request.user.username|first|upper }}</span>
+      <div class="account-meta"><span class="account-name">{{ request.user.get_full_name|default:request.user.username }}</span><form class="account-form" action="{% url 'logout' %}" method="post">{% csrf_token %}<button class="text-button" type="submit">Keluar dari studio</button></form></div>
+    </div>
+  </aside>
+  <div class="app-main">
+    <header class="topbar">
+      <a class="mobile-brand" href="{% url 'invitations:dashboard' %}">rewamore</a>
+      <div class="breadcrumb"><span>Studio</span><span aria-hidden="true">/</span><strong>{% block breadcrumb %}Undangan saya{% endblock %}</strong></div>
+      <span class="topbar-caption">Satu kisah. Banyak kenangan.</span><form class="mobile-session" action="{% url 'logout' %}" method="post">{% csrf_token %}<button class="text-button" type="submit">Keluar</button></form>
+    </header>
+    <main id="main-content" class="page-content">
+      {% if messages %}<div aria-live="polite">{% for message in messages %}<div class="alert {{ message.tags }}" role="status">{{ message }}</div>{% endfor %}</div>{% endif %}
+      {% block content %}{% endblock %}
+      <footer class="page-footer"><span>Rewamore Invitation Studio</span><span>Dibuat untuk cerita yang berarti.</span></footer>
+    </main>
+  </div>
+</div>
+<div class="copy-toast" id="copy-toast" role="status" aria-live="polite"></div>
+</body>
+</html>
