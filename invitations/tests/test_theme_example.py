@@ -56,3 +56,14 @@ class ThemeExampleTests(TestCase):
             example = ThemeExample.objects.get(theme=self.theme)
             self.assertTrue(example.content[field['key']].startswith('/media/theme-examples/'))
             self.assertEqual(example.assets.count(), 1)
+
+    @override_settings(PUBLIC_BASE_URL='https://template.rewamore.my.id', ALLOWED_HOSTS=['template.rewamore.my.id'])
+    def test_subdomain_share_url_and_open_graph_image(self):
+        self.client.force_login(self.admin)
+        response = self.client.get(reverse('invitations:themes'), HTTP_HOST='template.rewamore.my.id', secure=True)
+        self.assertContains(response, 'https://template.rewamore.my.id/dashboard/themes/1/preview/')
+        self.client.logout()
+        response = self.client.get(reverse('invitations:theme_preview', args=['1']), HTTP_HOST='template.rewamore.my.id', secure=True)
+        soup = BeautifulSoup(response.content, 'html.parser')
+        self.assertEqual(soup.find('meta', property='og:url')['content'], 'https://template.rewamore.my.id/dashboard/themes/1/preview/')
+        self.assertTrue(soup.find('meta', property='og:image')['content'].startswith('https://template.rewamore.my.id/'))

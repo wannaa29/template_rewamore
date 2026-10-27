@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
-  <meta name="theme-color" content="#365943">
+  <meta name="theme-color" content="#71334b">
   <title>{% block title %}Studio Undangan{% endblock %} | Rewamore</title>
   <link rel="stylesheet" href="{% static 'studio/studio.css' %}">
   <script src="{% static 'studio/studio.js' %}" defer></script>
@@ -16,8 +16,8 @@
     <a class="wordmark" href="{% url 'invitations:dashboard' %}">rewamore<small>Invitation studio</small></a>
     <p class="sidebar-label">Ruang kerja</p>
     <nav class="sidebar-nav">
-      <a href="{% url 'invitations:dashboard' %}" class="{% if request.resolver_match.url_name != 'themes' and request.resolver_match.url_name != 'create' %}active{% endif %}"><span class="nav-index">01</span> Undangan saya</a>
-      <a href="{% url 'invitations:themes' %}" class="{% if request.resolver_match.url_name == 'themes' or request.resolver_match.url_name == 'create' %}active{% endif %}"><span class="nav-index">02</span> Koleksi tema</a>
+      <a href="{% url 'invitations:dashboard' %}" class="{% if request.resolver_match.url_name != 'themes' and request.resolver_match.url_name != 'create' and request.resolver_match.url_name != 'edit_theme_example' %}active{% endif %}"><span class="nav-index">01</span> Undangan saya</a>
+      <a href="{% url 'invitations:themes' %}" class="{% if request.resolver_match.url_name == 'themes' or request.resolver_match.url_name == 'create' or request.resolver_match.url_name == 'edit_theme_example' %}active{% endif %}"><span class="nav-index">02</span> Koleksi tema</a>
       {% if request.user.is_staff %}<a href="{% url 'admin:index' %}"><span class="nav-index">03</span> Administrasi</a>{% endif %}
     </nav>
     <div class="sidebar-note"><strong>Setiap cerita layak dirayakan.</strong>Rancang undangan personal, lalu bagikan kepada orang-orang terdekat.</div>

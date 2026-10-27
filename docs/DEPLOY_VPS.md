@@ -4,7 +4,7 @@ Paket menyediakan Docker Compose dengan PostgreSQL, Django/Gunicorn, dan Caddy u
 
 ## 1. Domain dan berkas
 
-Atur DNS A `rewamore.my.id` ke IPv4 VPS. Jika menggunakan AAAA, pastikan IPv6 benar-benar menuju VPS. Unggah dan ekstrak folder `rewamore` ke VPS, misalnya `/opt/rewamore`.
+Atur DNS A `template.rewamore.my.id` ke IPv4 VPS. Ini merupakan subdomain terpisah; tidak perlu mengubah DNS `rewamore.my.id`. Jika menggunakan AAAA, pastikan IPv6 benar-benar menuju VPS. Unggah dan ekstrak folder `rewamore` ke VPS, misalnya `/opt/rewamore`.
 
 ```bash
 cd /opt/rewamore
@@ -12,7 +12,7 @@ cp deploy/production.env.example .env
 chmod 600 .env
 ```
 
-Edit `.env`. Ganti `DOMAIN`, `ALLOWED_HOSTS`, `CSRF_TRUSTED_ORIGINS`, dan `PUBLIC_BASE_URL` jika domain Anda berbeda. Nilai `PUBLIC_BASE_URL` tidak boleh memuat path, misalnya `/undangan`.
+Edit `.env`. Contoh sudah menggunakan `template.rewamore.my.id` untuk `DOMAIN`, `ALLOWED_HOSTS`, `CSRF_TRUSTED_ORIGINS`, dan `PUBLIC_BASE_URL`; sesuaikan nilai tersebut pada `.env` produksi yang sudah ada. Jika server sudah menjalankan situs utama pada port 80/443, tambahkan konfigurasi subdomain ke reverse proxy yang sudah ada; jangan menjalankan dua proxy yang mengikat port yang sama. Nilai `PUBLIC_BASE_URL` tidak boleh memuat path, misalnya `/undangan`.
 
 Origin `PUBLIC_BASE_URL` kini otomatis ditambahkan ke daftar origin CSRF dan host yang diizinkan. Domain tambahan tetap harus diatur secara eksplisit; jangan memakai wildcard untuk mengatasi kegagalan login. Buka formulir dan kirim login pada domain yang sama melalui HTTPS. Jika ada CDN, jangan cache `/accounts/*`, `/dashboard/*`, atau `/admin/*`.
 
@@ -34,7 +34,7 @@ docker compose exec web python manage.py createsuperuser
 docker compose exec web python manage.py check --deploy
 ```
 
-Entrypoint menjalankan migrasi, impor sepuluh tema, dan `collectstatic` sebelum Gunicorn. Caddy menerbitkan sertifikat HTTPS saat DNS dan akses port sudah benar. Buka `https://rewamore.my.id/`, kemudian login. Jangan menjalankan `runserver` untuk layanan publik.
+Entrypoint menjalankan migrasi, impor sepuluh tema, dan `collectstatic` sebelum Gunicorn. Caddy menerbitkan sertifikat HTTPS saat DNS dan akses port sudah benar. Buka `https://template.rewamore.my.id/`, kemudian login. Jangan menjalankan `runserver` untuk layanan publik.
 
 Volume media, database, cache, dan sertifikat bertahan saat container dibuat ulang. Port PostgreSQL dan Gunicorn tidak dipublikasikan langsung ke internet. `TRUST_PROXY=True` hanya benar pada topologi ini karena Caddy menimpa header alamat IP dan protokol. Jangan mengekspos port aplikasi langsung dengan pengaturan tersebut.
 
@@ -70,6 +70,8 @@ Perintah pemulihan database mengganti data database tujuan. Pastikan target pemu
 ## 5. Pembaruan kode
 
 Cadangkan database/media, ganti kode, kemudian jalankan `docker compose up -d --build`. Jangan mengganti `.env` produksi dengan contoh. Uji perubahan tema di salinan lingkungan sebelum memperbarui undangan aktif.
+
+Perubahan domain akan membuat tautan baru menggunakan subdomain tersebut. Tautan lama hanya tetap berfungsi apabila domain lama masih diarahkan dan dikonfigurasi untuk aplikasi ini. Jika berpindah dari domain lama, uji cookie, login, media, dan tautan undangan yang sudah dibagikan.
 
 Untuk pembaruan CSRF/login, lihat [FIX_CSRF_LOGIN.md](FIX_CSRF_LOGIN.md). Pastikan `collectstatic` dijalankan agar `static/studio/login.js` tersedia. Entrypoint Docker sudah menjalankannya otomatis.
 
