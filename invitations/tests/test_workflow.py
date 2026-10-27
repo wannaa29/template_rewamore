@@ -32,6 +32,18 @@ class WorkflowTests(TestCase):
         cache.clear()
         self.client.force_login(self.owner)
 
+    def test_theme_preview_is_public_read_only_and_has_share_metadata(self):
+        self.client.logout()
+        url = reverse("invitations:theme_preview", args=[self.theme.slug])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'property="og:image"')
+        self.assertContains(response, 'https://rewamore.my.id/static/')
+        self.assertContains(response, 'property="og:url"')
+        self.assertEqual(self.client.post(url).status_code, 405)
+        self.assertEqual(self.client.get(reverse("invitations:preview", args=[self.invitation.pk])).status_code, 302)
+        self.assertEqual(self.client.post(reverse("invitations:edit", args=[self.invitation.pk])).status_code, 302)
+
     def test_guest_links_use_percent_spaces_and_escape_special_characters(self):
         guest = Guest.objects.create(invitation=self.invitation, name="Iin Sinurat dan Pasangan")
         self.assertEqual(guest.invitation_url(), "https://rewamore.my.id/riswan-dan-iin/?to=Iin%20Sinurat%20dan%20Pasangan")

@@ -1,5 +1,7 @@
 # Rewamore Invitation Studio
 
+Pembaruan login/CSRF: lihat [petunjuk pemasangan dan hasil uji](docs/FIX_CSRF_LOGIN.md).
+
 Proyek Django untuk membuat banyak undangan dari **10 tema dalam template.zip**, menyunting konten per bagian, mengunggah foto, lalu membuat tautan personal untuk setiap tamu. Tema asli dipertahankan sebagai HTML, CSS, animasi, dan aset, bukan diganti satu desain generik.
 
 ## Mulai di komputer lokal

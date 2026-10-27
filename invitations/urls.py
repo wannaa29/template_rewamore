@@ -6,6 +6,7 @@ urlpatterns = [
     path("dashboard/", views.dashboard, name="dashboard"),
     path("dashboard/themes/", views.themes, name="themes"),
     path("dashboard/themes/<slug:theme_slug>/preview/", views.theme_preview, name="theme_preview"),
+    path("dashboard/themes/<slug:theme_slug>/edit-example/", views.edit_theme_example, name="edit_theme_example"),
     path("dashboard/themes/<slug:theme_slug>/create/", views.create, name="create"),
     path("dashboard/<int:pk>/edit/", views.edit, name="edit"),
     path("dashboard/<int:pk>/settings/", views.invitation_settings, name="settings"),

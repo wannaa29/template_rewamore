@@ -33,8 +33,8 @@ if not DEBUG and len(SECRET_KEY) < 50:
     raise ImproperlyConfigured('Gunakan SECRET_KEY acak minimal 50 karakter.')
 
 ALLOWED_HOSTS = [x.strip() for x in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,[::1]').split(',') if x.strip()]
-CSRF_TRUSTED_ORIGINS = [x.strip() for x in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if x.strip()]
-PUBLIC_BASE_URL = os.getenv('PUBLIC_BASE_URL', '').rstrip('/')
+CSRF_TRUSTED_ORIGINS = [x.strip().rstrip('/') for x in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if x.strip()]
+PUBLIC_BASE_URL = os.getenv('PUBLIC_BASE_URL', '').strip().rstrip('/')
 if PUBLIC_BASE_URL:
     from urllib.parse import urlsplit
     parts = urlsplit(PUBLIC_BASE_URL)
@@ -42,6 +42,14 @@ if PUBLIC_BASE_URL:
         raise ImproperlyConfigured('PUBLIC_BASE_URL harus origin, misalnya https://rewamore.my.id')
     if not DEBUG and parts.scheme != 'https':
         raise ImproperlyConfigured('PUBLIC_BASE_URL produksi wajib menggunakan HTTPS.')
+    # Trust only the origin explicitly configured by the operator, never a
+    # request-supplied Origin/Host. Avoid three settings drifting out of sync.
+    if parts.hostname not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(parts.hostname)
+    if PUBLIC_BASE_URL not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(PUBLIC_BASE_URL)
+
+CSRF_FAILURE_VIEW = 'invitations.auth.csrf_failure'
 
 INSTALLED_APPS = [
     'django.contrib.admin', 'django.contrib.auth', 'django.contrib.contenttypes',
@@ -99,7 +107,7 @@ LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 CACHES = {'default': {
     'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-    'LOCATION': str(BASE_DIR / 'var' / 'cache'),
+    'LOCATION': os.getenv('CACHE_LOCATION') or str(BASE_DIR / 'var' / 'cache'),
     'OPTIONS': {'MAX_ENTRIES': 10000},
 }}
 DATA_UPLOAD_MAX_MEMORY_SIZE = 60 * 1024 * 1024

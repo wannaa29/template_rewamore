@@ -504,8 +504,30 @@ def render_invitation(invitation, request=None, guest_name='', preview=False):
         soup.head.insert(0,json_node)
         if css:
             style=soup.new_tag('style');style.string='\n'.join(css);soup.head.append(style)
-        # Dynamic public preview image should be an absolute URL for link crawlers.
-        image_meta=soup.find('meta',attrs={'property':'og:image'})
-        if image_meta and request and image_meta.get('content','').startswith('/'):
-            image_meta['content']=request.build_absolute_uri(image_meta['content'])
+        # Social crawlers need metadata in the initial HTML and an absolute image URL.
+        if request:
+            origin = settings.PUBLIC_BASE_URL.rstrip('/') or request.build_absolute_uri('/').rstrip('/')
+            def meta(prop, value):
+                node = soup.find('meta', attrs={'property': prop})
+                if node is None:
+                    node = soup.new_tag('meta', property=prop)
+                    soup.head.append(node)
+                node['content'] = value
+            image_meta = soup.find('meta', attrs={'property':'og:image'})
+            image = image_meta.get('content', '') if image_meta else ''
+            if not image:
+                image = getattr(invitation.theme, 'preview_image', '') or theme_preview(slug)
+            if image.startswith('/'):
+                image = origin + image
+            if image.startswith(('https://', 'http://')):
+                meta('og:image', image)
+            title = (f'Pratinjau {getattr(invitation.theme, "name", slug)} | Rewamore' if preview and invitation.pk is None
+                     else f'{invitation.title} | Rewamore')
+            existing_title = soup.find('meta', attrs={'property':'og:title'})
+            existing_desc = soup.find('meta', attrs={'property':'og:description'})
+            meta('og:title', existing_title.get('content') or title if existing_title else title)
+            description = 'Lihat desain undangan digital Rewamore.' if preview else 'Dengan penuh sukacita, kami mengundang Anda untuk merayakan hari istimewa kami.'
+            meta('og:description', existing_desc.get('content') or description if existing_desc else description)
+            meta('og:type', 'website')
+            meta('og:url', origin + request.path)
     return str(soup)

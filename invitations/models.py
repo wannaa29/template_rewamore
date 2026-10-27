@@ -116,3 +116,26 @@ class Attendance(models.Model):
     def __str__(self):
         return f"{self.name}: {self.get_attendance_display()}"
 
+
+
+def example_asset_path(instance, filename):
+    return f"theme-examples/{instance.example.theme_id}/{uuid.uuid4().hex}{Path(filename).suffix.lower()}"
+
+
+class ThemeExample(models.Model):
+    """The shared, editable example is separate from customer invitations."""
+    theme = models.OneToOneField(Theme, on_delete=models.CASCADE, related_name="example")
+    content = models.JSONField(default=dict)
+    sections = models.JSONField(default=dict)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+class ThemeExampleAsset(models.Model):
+    example = models.ForeignKey(ThemeExample, on_delete=models.CASCADE, related_name="assets")
+    file = models.FileField(upload_to=example_asset_path, max_length=250)
+    kind = models.CharField(max_length=10, choices=[("image", "Gambar"), ("audio", "Audio"), ("video", "Video")])
+    original_name = models.CharField(max_length=250)
+
+    def clean(self):
+        if self.file and not self.file._committed:
+            validate_upload(self.file, self.kind)

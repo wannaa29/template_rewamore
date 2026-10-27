@@ -1,0 +1,20 @@
+{% extends 'studio/base.html' %}
+{% block title %}Edit preview {{ theme.name }}{% endblock %}{% block breadcrumb %}Edit preview tema{% endblock %}
+{% block content %}
+<div class="page-heading editor-heading"><div><span class="eyebrow">Contoh tema · {{ theme.name }}</span><h1>Edit preview tema</h1><p>Perubahan yang disimpan tampil pada tautan contoh bersama. Undangan klien dibuat dan dikelola secara terpisah.</p></div><div class="actions"><a class="button button-secondary" href="{% url 'invitations:themes' %}">Kembali ke koleksi</a><a class="button button-secondary" href="{% url 'invitations:theme_preview' theme.slug %}" target="_blank" rel="noopener">Lihat preview ↗</a><button class="button" type="button" data-copy="{{ share_url }}">Salin tautan</button></div></div>
+<div class="editor-layout">
+  <nav class="section-nav" aria-label="Bagian tema"><h2>Bagian tema</h2>{% for section in sections %}<a href="?section={{ section.key|urlencode }}" class="{% if section.key == active_section.key %}active{% endif %}" {% if section.key == active_section.key %}aria-current="page"{% endif %}>{{ section.label }}<span>{{ section.fields|length }}</span></a>{% endfor %}</nav>
+  <section class="panel editor-panel"><h2>{{ active_section.label }}</h2><p class="intro">Ubah isi, lalu simpan bagian ini untuk memperbarui preview yang dibagikan.</p>
+    <form method="post" enctype="multipart/form-data" action="?section={{ active_section.key|urlencode }}" data-track-changes id="section-editor">{% csrf_token %}
+      {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+      {% if active_section.can_hide != False %}<label class="switch-label" for="{{ form.section_enabled.id_for_label }}">{{ form.section_enabled }} Tampilkan bagian ini</label>{{ form.section_enabled.errors }}{% endif %}
+      {% if editor_fields|length > 5 %}<label class="sr-only" for="field-search">Cari kolom</label><input class="input field-search" id="field-search" type="search" placeholder="Cari isian pada bagian ini…" data-field-search autocomplete="off">{% endif %}
+      {% for item in editor_fields %}{% if not item.advanced %}{% include 'studio/example_field.html' %}{% endif %}{% endfor %}
+      {% if has_advanced %}<details class="advanced-fields" {% if form.errors %}open{% endif %}><summary>Pengaturan lanjutan dan aksesibilitas</summary><p class="field-help">Label, deskripsi gambar, dan isian teknis untuk bagian ini.</p>{% for item in editor_fields %}{% if item.advanced %}{% include 'studio/example_field.html' %}{% endif %}{% endfor %}</details>{% endif %}
+      <p class="muted small hide" data-no-fields>Tidak ada kolom yang sesuai dengan pencarian.</p>
+      <div class="editor-save"><span class="save-state" data-save-state>Perubahan disimpan per bagian.</span><button class="button" type="submit">Simpan bagian</button></div>
+    </form>
+  </section>
+  <aside class="preview-panel"><div class="preview-header"><span>Pratinjau ponsel</span><button class="button button-secondary button-small" type="button" data-reload-preview>Perbarui</button></div><div class="phone-frame"><iframe id="invitation-preview" src="{% url 'invitations:theme_preview' theme.slug %}" title="Pratinjau tema {{ theme.name }}" loading="lazy"></iframe></div><p class="preview-caption">Preview menampilkan perubahan yang sudah disimpan.</p></aside>
+</div>
+{% endblock %}

@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from django.urls import include, path
 from django.views.generic import RedirectView
 
-from invitations.auth import StudioLoginView
+from invitations.auth import StudioLoginView, csrf_token
 
 def health(request):
     return JsonResponse({'status': 'ok'})
@@ -15,6 +15,7 @@ urlpatterns = [
     path('', RedirectView.as_view(pattern_name='invitations:dashboard', permanent=False)),
     path('health/', health, name='health'),
     path('admin/', admin.site.urls),
+    path('accounts/csrf/', csrf_token, name='csrf_token'),
     path('accounts/login/', StudioLoginView.as_view(template_name='registration/login.html'), name='login'),
     path('accounts/logout/', LogoutView.as_view(), name='logout'),
     path('', include('invitations.urls')),

@@ -8,7 +8,7 @@ from urllib.parse import quote
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.cache import cache
 from django.core.files.base import ContentFile
 from django.db import IntegrityError, transaction
@@ -24,7 +24,7 @@ from django.views.decorators.clickjacking import xframe_options_sameorigin
 from PIL import Image, ImageOps
 
 from .forms import AttendanceForm, BulkGuestForm, InvitationForm, SectionForm
-from .models import Attendance, Guest, Invitation, MediaAsset, Theme
+from .models import Attendance, Guest, Invitation, MediaAsset, Theme, ThemeExample, ThemeExampleAsset
 from .theme_engine import initial_content, render_invitation
 
 
@@ -36,7 +36,7 @@ def base_url(request):
     return settings.PUBLIC_BASE_URL.rstrip("/") or request.build_absolute_uri("/").rstrip("/")
 
 
-def limited(request, scope, limit, seconds):
+def rate_limit_key(request, scope):
     # REMOTE_ADDR is populated by the trusted reverse proxy. Never trust a
     # client-supplied X-Forwarded-For without enforcing the proxy boundary.
     identity = request.META.get("REMOTE_ADDR", "unknown")
@@ -46,7 +46,11 @@ def limited(request, scope, limit, seconds):
             identity = str(ipaddress.ip_address(forwarded))
         except ValueError:
             pass
-    key = "rewamore:rate:" + hashlib.sha256(f"{scope}:{identity}".encode()).hexdigest()
+    return "rewamore:rate:" + hashlib.sha256(f"{scope}:{identity}".encode()).hexdigest()
+
+
+def limited(request, scope, limit, seconds):
+    key = rate_limit_key(request, scope)
     if cache.add(key, 1, seconds):
         return False
     try:
@@ -70,17 +74,86 @@ def dashboard(request):
 
 @login_required
 def themes(request):
-    return render(request, "studio/themes.html", {"themes": Theme.objects.all()})
+    themes = list(Theme.objects.select_related("example"))
+    for theme in themes:
+        theme.card_image = theme.preview_image
+        try:
+            example = theme.example
+        except ThemeExample.DoesNotExist:
+            example = None
+        if example:
+            for section in theme.schema.get("sections", []):
+                if section.get("label") in ("Sampul", "Pembuka"):
+                    image_field = next((field for field in section.get("fields", []) if field.get("type") == "image" and field.get("target") == "image"), None)
+                    if image_field and example.content.get(image_field["key"]):
+                        theme.card_image = example.content[image_field["key"]]
+                        break
+        theme.share_url = base_url(request) + reverse("invitations:theme_preview", args=[theme.slug])
+    return render(request, "studio/themes.html", {"themes": themes})
 
 
-@login_required
+@require_GET
 @never_cache
 @xframe_options_sameorigin
 def theme_preview(request, theme_slug):
     theme = get_object_or_404(Theme, slug=theme_slug)
-    invitation = Invitation(owner=request.user, theme=theme, title="Pratinjau tema", groom_name="Riswan", bride_name="Iin", slug="pratinjau-tema", content=initial_content(theme, "Riswan", "Iin"), sections={})
+    example = ThemeExample.objects.filter(theme=theme).first()
+    invitation = Invitation(theme=theme, title="Pratinjau tema", groom_name="Riswan", bride_name="Iin", slug="pratinjau-tema", content=example.content if example else initial_content(theme, "Riswan", "Iin"), sections=example.sections if example else {})
     html = render_invitation(invitation, request=request, guest_name="Adrian dan Pasangan", preview=True)
     return HttpResponse(html)
+
+
+@login_required
+@user_passes_test(lambda user: user.is_staff, login_url="invitations:themes")
+def edit_theme_example(request, theme_slug):
+    theme = get_object_or_404(Theme, slug=theme_slug)
+    example, _ = ThemeExample.objects.get_or_create(theme=theme, defaults={"content": initial_content(theme, "Riswan", "Iin")})
+    sections = theme.schema.get("sections", [])
+    if not sections:
+        messages.error(request, "Tema belum mempunyai skema. Jalankan import_themes.")
+        return redirect("invitations:themes")
+    section_key = request.GET.get("section", sections[0]["key"])
+    active = next ( (section for section in sections if section["key"] == section_key), None)
+    if active is None:
+        raise Http404("Bagian tidak ditemukan")
+    form = SectionForm(request.POST or None, request.FILES or None, section=active, invitation=example)
+    if request.method == "POST" and form.is_valid():
+        with transaction.atomic():
+            current = ThemeExample.objects.select_for_update().get(pk=example.pk)
+            content = dict(current.content)
+            for field in active.get("fields", []):
+                key, kind = field["key"], field.get("type", "text")
+                value = form.cleaned_data.get(f"field_{key}")
+                if isinstance(value, (date, datetime)):
+                    value = value.isoformat()
+                if value is None:
+                    value = ""
+                upload = form.cleaned_data.get(f"upload_{key}")
+                if upload:
+                    name = upload.name
+                    if kind == "image":
+                        with Image.open(upload) as original:
+                            image = ImageOps.exif_transpose(original)
+                            output = io.BytesIO()
+                            alpha = "A" in image.getbands() or "transparency" in image.info
+                            image.convert("RGBA" if alpha else "RGB").save(output, format="WEBP", quality=90)
+                        upload = ContentFile(output.getvalue(), name="photo.webp")
+                    asset = ThemeExampleAsset(example=current, file=upload, kind=kind, original_name=name[:250])
+                    asset.full_clean()
+                    asset.save()
+                    value = asset.file.url
+                content[key] = value
+            current.content = content
+            current.sections = dict(current.sections, **{section_key: form.cleaned_data["section_enabled"] if active.get("can_hide", True) else True})
+            current.save(update_fields=["content", "sections", "updated_at"])
+        messages.success(request, f'Bagian "{active["label"]}" disimpan dan tersedia pada tautan preview.')
+        return redirect(reverse("invitations:edit_theme_example", args=[theme_slug]) + "?section=" + quote(section_key))
+    editor_fields = []
+    for field in active.get("fields", []):
+        key = field["key"]
+        advanced = field.get("target") == "attr" and field.get("attr") in {"alt", "aria-label", "placeholder", "datetime"}
+        editor_fields.append({**field, "advanced": advanced, "value": example.content.get(key, field.get("default", "")), "bound": form[f"field_{key}"], "upload": form[f"upload_{key}"] if f"upload_{key}" in form.fields else None})
+    return render(request, "studio/edit_theme_example.html", {"theme": theme, "sections": sections, "active_section": active, "form": form, "editor_fields": editor_fields, "has_advanced": any(field["advanced"] for field in editor_fields), "share_url": base_url(request) + reverse("invitations:theme_preview", args=[theme.slug])})
 
 
 @login_required

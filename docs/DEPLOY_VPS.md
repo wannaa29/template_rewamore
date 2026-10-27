@@ -14,6 +14,8 @@ chmod 600 .env
 
 Edit `.env`. Ganti `DOMAIN`, `ALLOWED_HOSTS`, `CSRF_TRUSTED_ORIGINS`, dan `PUBLIC_BASE_URL` jika domain Anda berbeda. Nilai `PUBLIC_BASE_URL` tidak boleh memuat path, misalnya `/undangan`.
 
+Origin `PUBLIC_BASE_URL` kini otomatis ditambahkan ke daftar origin CSRF dan host yang diizinkan. Domain tambahan tetap harus diatur secara eksplisit; jangan memakai wildcard untuk mengatasi kegagalan login. Buka formulir dan kirim login pada domain yang sama melalui HTTPS. Jika ada CDN, jangan cache `/accounts/*`, `/dashboard/*`, atau `/admin/*`.
+
 Buat nilai acak untuk `SECRET_KEY` dan `POSTGRES_PASSWORD`. Contoh berikut menampilkan dua nilai acak agar dapat disalin ke `.env`:
 
 ```bash
@@ -69,10 +71,12 @@ Perintah pemulihan database mengganti data database tujuan. Pastikan target pemu
 
 Cadangkan database/media, ganti kode, kemudian jalankan `docker compose up -d --build`. Jangan mengganti `.env` produksi dengan contoh. Uji perubahan tema di salinan lingkungan sebelum memperbarui undangan aktif.
 
+Untuk pembaruan CSRF/login, lihat [FIX_CSRF_LOGIN.md](FIX_CSRF_LOGIN.md). Pastikan `collectstatic` dijalankan agar `static/studio/login.js` tersedia. Entrypoint Docker sudah menjalankannya otomatis.
+
 ## Batas implementasi
 
 - Unggahan media tersedia melalui URL publik acak agar dapat dibuka penerima undangan. Draf halaman dilindungi login, tetapi berkas media bukan penyimpanan dokumen rahasia.
 - Tautan tamu memuat sapaan, bukan bukti identitas. RSVP tidak mengautentikasi orang yang mengetik nama dan beberapa respons dari nama sama mungkin muncul.
-- Pembatasan percobaan login/RSVP memakai cache berkas bersama untuk satu host. Untuk skala beberapa server, gunakan cache bersama dan pembatasan pada reverse proxy yang sesuai.
+- Login membatasi 10 percobaan gagal per pasangan akun dan IP selama sekitar lima menit; login berhasil tidak memakai kuota dan menghapus hitungan gagal untuk pasangan tersebut. RSVP tetap memakai batas sebelumnya. Cache berkas ini bersifat best effort (operasi hitung tidak atomik). Untuk beberapa server atau perlindungan brute force yang ketat, gunakan pembatas atomik pada cache bersama/reverse proxy.
 - Penghapusan undangan menghapus catatan terkait. Berkas media tidak dibersihkan otomatis agar referensi pada salinan undangan tidak rusak. Pemeliharaan berkas tidak terpakai perlu dilakukan berdasarkan backup dan pemeriksaan referensi.
 - Foto eksternal dan layanan peta/YouTube memerlukan internet. Aset yang diunggah sendiri lebih konsisten untuk undangan klien.

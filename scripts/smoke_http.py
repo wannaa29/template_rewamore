@@ -25,6 +25,7 @@ def main():
     with tempfile.TemporaryDirectory(prefix='rewamore-smoke-') as temp:
         env = dict(os.environ, DEBUG='True', SECRET_KEY=secrets.token_hex(48),
                    DATABASE_URL=f'sqlite:///{temp}/db.sqlite3',
+                   CACHE_LOCATION=f'{temp}/cache', CSRF_TRUSTED_ORIGINS='',
                    ALLOWED_HOSTS='127.0.0.1,localhost', PUBLIC_BASE_URL='',
                    SECURE_SSL_REDIRECT='False', TRUST_PROXY='False')
         password = secrets.token_urlsafe(32)

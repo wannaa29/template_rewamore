@@ -1,0 +1,7 @@
+      <div class="form-field edit-field" data-edit-field data-search-text="{{ item.label }} {{ item.value }}">
+        <label for="{{ item.bound.id_for_label }}">{{ item.label }} <span class="field-kind">{% if item.type == 'image' %}Foto{% elif item.type == 'audio' %}Audio{% elif item.type == 'video' %}Video{% elif item.type == 'link' or item.type == 'url' %}Tautan{% endif %}</span></label>
+        {% if item.value %}{% if item.type == 'image' %}<img class="media-preview" src="{{ item.value }}" alt="Pratinjau {{ item.label }}" loading="lazy" data-upload-preview>{% elif item.type == 'audio' %}<audio class="media-preview audio-preview" controls preload="none" src="{{ item.value }}" data-upload-preview></audio>{% elif item.type == 'video' %}<video class="media-preview video-preview" controls preload="metadata" src="{{ item.value }}" data-upload-preview></video>{% endif %}{% endif %}
+        {{ item.bound }}{{ item.bound.errors }}
+        {% if item.bound.help_text %}<span class="field-help">{{ item.bound.help_text }}</span>{% endif %}
+        {% if item.upload %}<label class="upload-label" for="{{ item.upload.id_for_label }}">Atau unggah berkas pengganti</label>{{ item.upload }}{{ item.upload.errors }}{% if item.upload.help_text %}<span class="field-help">{{ item.upload.help_text }}</span>{% endif %}{% endif %}
+      </div>
