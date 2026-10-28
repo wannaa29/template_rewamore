@@ -12,6 +12,7 @@ from PIL import Image
 from invitations.forms import BulkGuestForm, InvitationForm, SectionForm
 from invitations.models import Attendance, Guest, Invitation, Theme
 from invitations.views import limited
+from invitations.theme_engine import THEMES, get_theme_schema
 
 
 @override_settings(PUBLIC_BASE_URL="https://rewamore.my.id")
@@ -71,6 +72,24 @@ class WorkflowTests(TestCase):
         for action in ["publish", "duplicate", "delete"]:
             response = self.client.post(reverse(f"invitations:{action}", args=[self.invitation.pk]))
             self.assertEqual(response.status_code, 404, action)
+
+    def test_published_client_links_open_for_every_theme(self):
+        for slug, (name, description) in THEMES.items():
+            with self.subTest(theme=slug):
+                theme, _ = Theme.objects.update_or_create(
+                    slug=slug,
+                    defaults={"name": name, "description": description, "schema": get_theme_schema(slug)},
+                )
+                invitation = Invitation.objects.create(
+                    owner=self.owner, theme=theme, title=f"Test tema {slug}",
+                    groom_name="Mempelai Pria", bride_name="Mempelai Wanita",
+                    slug=f"test-tema-{slug}", status=Invitation.Status.PUBLISHED,
+                )
+                response = self.client.get(invitation.get_absolute_url())
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, 'id="rw-guestbook-page"')
+                self.assertContains(response, f'/{invitation.slug}/rsvp/')
+                self.assertContains(response, f'/{invitation.slug}/wishes/')
 
     def test_draft_is_private_publish_and_unpublish_are_post_only(self):
         self.assertEqual(self.client.get(self.invitation.get_absolute_url()).status_code, 404)
@@ -146,6 +165,28 @@ class WorkflowTests(TestCase):
         self.assertEqual(self.client.get(wishes).json()["wishes"], [])
         self.client.post(url, {"name": "Iin", "attendance": "maybe", "party_size": 1, "message": "Selamat!", "publish_message": "true"})
         self.assertEqual(len(self.client.get(wishes).json()["wishes"]), 1)
+
+    def test_guestbook_history_is_persisted_and_isolated_per_invitation(self):
+        self.invitation.status = Invitation.Status.PUBLISHED
+        self.invitation.save()
+        second = Invitation.objects.create(
+            owner=self.owner, theme=self.theme, title="Nadia & Raka", groom_name="Raka",
+            bride_name="Nadia", slug="nadia-dan-raka", status=Invitation.Status.PUBLISHED,
+        )
+        self.client.post(reverse("invitations:rsvp", args=[self.invitation.slug]), {
+            "name": "Tamu Riswan", "attendance": "yes", "party_size": 1,
+            "message": "Selamat untuk Riswan dan Iin", "publish_message": "true",
+        })
+        self.client.post(reverse("invitations:rsvp", args=[second.slug]), {
+            "name": "Tamu Nadia", "attendance": "yes", "party_size": 1,
+            "message": "Selamat untuk Nadia dan Raka", "publish_message": "true",
+        })
+        first_feed = self.client.get(reverse("invitations:wishes", args=[self.invitation.slug])).json()["wishes"]
+        second_feed = self.client.get(reverse("invitations:wishes", args=[second.slug])).json()["wishes"]
+        self.assertEqual([item["message"] for item in first_feed], ["Selamat untuk Riswan dan Iin"])
+        self.assertEqual([item["message"] for item in second_feed], ["Selamat untuk Nadia dan Raka"])
+        self.assertEqual(Attendance.objects.filter(invitation=self.invitation).count(), 1)
+        self.assertEqual(Attendance.objects.filter(invitation=second).count(), 1)
 
     def test_rsvp_validation_csrf_and_rate_limit(self):
         self.invitation.status = Invitation.Status.PUBLISHED

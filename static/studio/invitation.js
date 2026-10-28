@@ -229,8 +229,15 @@
     }
   }, true);
 
+  function findRSVPForm() {
+    var form = query('#rsvpForm, #rsvp-form, form[data-rsvp-form], form[name="rsvp"]');
+    if (form) return form;
+    var section = query('section#rsvp, section#ucapan, section#wishes, section.rsvp, section.rsvp-section, [data-rsvp-section]');
+    if (section && query('form', section)) return query('form', section);
+    return all('form').find(function (candidate) { return /rsvp|wish|ucapan/i.test((candidate.id || '') + ' ' + (candidate.className || '')); }) || null;
+  }
   function setupRSVP() {
-    var form = query('#rsvpForm, #rsvp-form');
+    var form = findRSVPForm();
     if (!form) return;
     form.method = 'post'; form.action = data.rsvpUrl || '';
     all('[type="submit"]', form).forEach(function (button) { button.disabled = false; });
@@ -268,26 +275,40 @@
     small.textContent = Number.isFinite(date.getTime()) ? date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
     card.append(name, message, small); if (!full) card.addEventListener('click', openWishesModal); return card;
   }
+  function scrollWishSlider(direction) {
+    var track = query('[data-rw-wishes-track]');
+    if (!track) return;
+    var card = query('.rw-wish-card', track);
+    var step = card ? card.getBoundingClientRect().width + 16 : track.clientWidth * .8;
+    var max = Math.max(0, track.scrollWidth - track.clientWidth);
+    if (direction > 0 && track.scrollLeft >= max - 8) track.scrollTo({ left: 0, behavior: 'smooth' });
+    else if (direction < 0 && track.scrollLeft <= 8) track.scrollTo({ left: max, behavior: 'smooth' });
+    else track.scrollBy({ left: step * direction, behavior: 'smooth' });
+  }
   function renderWishes() {
     var track = query('[data-rw-wishes-track]'), list = query('[data-rw-wishes-list]'), count = query('[data-rw-wishes-count]');
-    if (count) count.textContent = wishesCache.length + ' ucapan';
+    if (count) count.textContent = wishesCache.length + (wishesCache.length === 1 ? ' ucapan' : ' ucapan');
     if (track) {
       track.replaceChildren();
       var latest = wishesCache.slice(0, 4);
       if (!latest.length) { var empty = document.createElement('p'); empty.className = 'rw-wishes-empty'; empty.textContent = 'Belum ada ucapan yang dibagikan.'; track.append(empty); }
       latest.forEach(function (wish) { track.append(wishCard(wish, false)); });
+      track.scrollLeft = 0;
     }
     if (list) { list.replaceChildren(); wishesCache.forEach(function (wish) { list.append(wishCard(wish, true)); }); }
     window.clearInterval(wishesTimer);
-    if (wishesCache.length > 4 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (track && wishesCache.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       wishesTimer = window.setInterval(function () {
-        var trackNow = query('[data-rw-wishes-track]'); if (!trackNow || query('[data-rw-wishes-modal]:not([hidden])')) return;
-        var first = wishesCache.shift(); wishesCache.push(first);
-        var animation = trackNow.animate([{ opacity: 1, transform: 'translateX(0)' }, { opacity: .35, transform: 'translateX(-12px)' }], { duration: 220, easing: 'ease-in' });
-        animation.onfinish = renderWishes;
-      }, 5000);
+        var trackNow = query('[data-rw-wishes-track]');
+        if (!trackNow || query('[data-rw-wishes-modal]:not([hidden])') || document.visibilityState === 'hidden') return;
+        if (trackNow.scrollWidth > trackNow.clientWidth + 8) scrollWishSlider(1);
+      }, 4500);
     }
   }
+  document.addEventListener('click', function (event) {
+    if (event.target.closest('[data-rw-wishes-prev]')) { scrollWishSlider(-1); return; }
+    if (event.target.closest('[data-rw-wishes-next]')) { scrollWishSlider(1); return; }
+  });
   function openWishesModal() {
     var modal = query('[data-rw-wishes-modal]'); if (!modal) return;
     modal.hidden = false; document.body.style.overflow = 'hidden';

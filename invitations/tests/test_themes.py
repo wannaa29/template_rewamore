@@ -35,6 +35,18 @@ class ThemeRenderingTests(SimpleTestCase):
                 for script in soup.find_all('script'):
                     self.assertTrue(script.get('src') or script.get('type')=='application/json')
 
+    def test_persisted_guestbook_is_injected_for_all_ten_themes(self):
+        for slug in THEMES:
+            with self.subTest(theme=slug):
+                invitation = self.invitation(slug)
+                soup = BeautifulSoup(render_invitation(invitation), "html.parser")
+                self.assertIsNotNone(soup.select_one("#rw-guestbook-page [data-rw-wishes-slider]"))
+                self.assertIsNotNone(soup.select_one("[data-rw-wishes-track]"))
+                self.assertIsNotNone(soup.select_one("[data-rw-wishes-modal]"))
+                data = json.loads(soup.find(id="rewamore-data").string)
+                self.assertEqual(data["wishesUrl"], "/riswan-dan-iin/wishes/")
+                self.assertEqual(data["rsvpUrl"], "/riswan-dan-iin/rsvp/")
+
     def test_custom_text_and_guest_are_escaped_not_executed(self):
         inv=self.invitation()
         field=next(f for f in fields_for(inv.theme.schema) if f['type']=='text' and f.get('target')=='text')

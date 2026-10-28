@@ -1,0 +1,24 @@
+REVISI GLOBAL SEMUA TEMA
+
+1. Runtime RSVP/ucapan universal
+- Runtime kini mengenali form RSVP melalui ID standar, atribut data-rsvp-form, name=rsvp, atau form yang berada di section RSVP/ucapan.
+- Semua 10 tema yang ada saat ini memiliki form yang dikenali dan akan mendapat halaman buku ucapan global, slider 4 ucapan terbaru, tombol lihat semua, dan modal pesan.
+- Endpoint /<slug-undangan>/wishes/ mengambil Attendance berdasarkan relasi Invitation yang tepat dan hanya mengembalikan pesan dengan publish_message=True serta message tidak kosong.
+- Endpoint RSVP menyimpan Attendance dengan invitation yang berasal dari slug URL. Data dua klien tidak bercampur walaupun tema mereka sama.
+
+2. Tautan undangan yang tidak bisa dibuka
+- Tautan publik memang sengaja mengembalikan 404 selama status undangan masih DRAFT agar undangan yang belum disetujui tidak dapat diakses tamu.
+- Halaman Tamu & Tautan sekarang menjelaskan status ini dan menyediakan tombol Terbitkan undangan.
+- Tombol salin tautan publik, salin tautan personal, dan WhatsApp baru tersedia setelah status PUBLISHED. Ini mencegah tautan draf disangka tautan aktif.
+- Setelah diterbitkan, tautan publik /<slug>/ serta RSVP dan ucapan harus dapat dibuka untuk setiap tema.
+
+3. Data klien
+- Tidak dibuat database fisik terpisah untuk setiap klien. Semua data berada pada database aplikasi yang sama, tetapi diisolasi secara logis melalui foreign key Attendance.invitation ke masing-masing Invitation.
+- Ini lebih aman dan praktis daripada satu database fisik per undangan; endpoint feed wajib memfilter berdasarkan invitation yang sedang dibuka.
+
+4. Validasi
+- `python -m compileall -q invitations config` berhasil.
+- `node --check static/studio/invitation.js` berhasil.
+- Pemeriksaan statis memastikan semua 10 sumber tema memiliki form RSVP yang dikenali.
+- Tes Django ditambahkan untuk memastikan halaman ucapan terpasang pada semua tema dan tautan terbitan membuka semua tema.
+- Tes Django runtime belum dapat dijalankan di lingkungan penyusunan ini karena Django tidak terpasang. Jalankan `python manage.py check` dan `python manage.py test invitations.tests.test_themes invitations.tests.test_workflow` pada lingkungan proyek setelah dependensi terpasang.
