@@ -38,3 +38,25 @@
 @media(max-width:700px){.rw-guestbook-page{min-height:0;padding:56px 14px 68px}.rw-guestbook{padding:25px 16px 20px;border-radius:18px}.rw-guestbook-heading{margin-bottom:24px}.rw-wishes-slider{gap:8px}.rw-wishes-arrow{flex-basis:34px;width:34px;height:34px;font-size:18px}.rw-wishes-track{gap:12px;padding-bottom:13px}.rw-wish-card{flex-basis:84%;min-height:185px;padding:18px}.rw-wishes-controls{gap:12px}.rw-wishes-list{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:380px){.rw-guestbook-page{padding-inline:9px}.rw-guestbook{padding-inline:12px}.rw-wishes-slider{gap:6px}.rw-wishes-arrow{flex-basis:30px;width:30px;height:30px}.rw-wish-card{flex-basis:90%}.rw-wishes-controls{font-size:11px}.rw-wishes-all{padding:9px 12px}}
 @media(prefers-reduced-motion:reduce){.rw-wishes-track{scroll-behavior:auto}.rw-wish-card,.rw-wishes-arrow{transition:none}}
+
+/* Mobile carousel fix: keep both navigation arrows visible outside a bounded card track. */
+@media(max-width:700px){
+  .rw-guestbook-page{width:100%;max-width:100%;min-width:0;overflow-x:clip;padding-inline:clamp(10px,3vw,18px)}
+  .rw-guestbook{width:100%;max-width:100%;min-width:0;padding:clamp(18px,4vw,26px) clamp(12px,3.5vw,18px)}
+  .rw-guestbook-heading{width:100%;max-width:100%;text-align:center}
+  .rw-guestbook-heading h2,.rw-guestbook-heading>p:last-child{max-width:100%;overflow-wrap:anywhere;text-align:center}
+  .rw-wishes-slider{display:grid!important;grid-template-columns:30px minmax(0,1fr) 30px!important;align-items:center;gap:6px!important;width:100%;min-width:0}
+  .rw-wishes-track{display:flex!important;grid-column:2;grid-row:1;min-width:0;width:100%;max-width:100%;gap:10px;padding:4px 1px 14px;overflow-x:auto}
+  .rw-wishes-slider>[data-rw-wishes-prev]{grid-column:1;grid-row:1;justify-self:center;z-index:2}
+  .rw-wishes-slider>[data-rw-wishes-next]{grid-column:3;grid-row:1;justify-self:center;z-index:2}
+  .rw-wishes-arrow{flex:none!important;width:30px!important;height:30px!important;min-width:30px;min-height:30px;padding:0;font-size:16px}
+  .rw-wish-card{flex:0 0 100%!important;width:100%;min-width:0!important;max-width:100%;min-height:150px;padding:16px 14px;overflow-wrap:anywhere}
+  .rw-wish-card strong{font-size:16px;overflow-wrap:anywhere}
+  .rw-wish-card p{font-size:13px;overflow-wrap:anywhere}
+  .rw-wishes-controls{display:flex;flex-direction:row!important;align-items:center!important;justify-content:center!important;gap:12px;flex-wrap:wrap;text-align:center}
+}
+@media(max-width:380px){
+  .rw-wishes-slider{grid-template-columns:26px minmax(0,1fr) 26px!important;gap:4px!important}
+  .rw-wishes-arrow{width:26px!important;height:26px!important;min-width:26px;min-height:26px;font-size:14px}
+  .rw-wish-card{padding:14px 12px}
+}

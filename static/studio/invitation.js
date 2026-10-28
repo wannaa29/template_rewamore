@@ -162,14 +162,13 @@
     var message = query('[name="message"], #rsvpMessage, #rsvp-message, #guestMessage, #message', form);
     var count = query('[name="party_size"], [name="guests"], [name="count"], #guestCount, #rsvp-guests', form);
     var website = query('[name="website"], #wishWebsite', form);
-    var consent = query('[name="publish_message"]', form);
     return {
       name: name ? name.value.trim() : '',
       attendance: attendanceValue(form),
       party_size: count ? String(Math.min(10, Math.max(1, Number(count.value) || 1))) : '1',
       message: message ? message.value.trim() : '',
       website: website ? website.value : '',
-      publish_message: consent && consent.checked ? 'true' : '',
+      publish_message: message && message.value.trim() ? 'true' : '',
       csrfmiddlewaretoken: data.csrfToken || ''
     };
   }
@@ -186,13 +185,13 @@
     // so the owner can verify the complete RSVP + published-wish experience before launch.
     if (data.preview) {
       if (!payload.name || !payload.attendance) { status('Lengkapi nama dan pilihan kehadiran Anda.', form); return; }
-      if (payload.message && payload.publish_message) {
+      if (payload.message) {
         wishesCache.unshift({ name: payload.name, message: payload.message, attendance: payload.attendance, created_at: new Date().toISOString(), preview: true });
         renderWishes();
       }
-      status(payload.message && payload.publish_message
+      status(payload.message
         ? 'Pratinjau berhasil: ucapan ditampilkan sementara dan belum disimpan ke undangan publik.'
-        : 'Pratinjau berhasil: konfirmasi tidak disimpan. Centang persetujuan publikasi agar ucapan terlihat.', form);
+        : 'Pratinjau berhasil: konfirmasi kehadiran ditampilkan sementara dan belum disimpan ke undangan publik.', form);
       return;
     }
     if (!payload.name || !payload.attendance) { status('Lengkapi nama dan pilihan kehadiran Anda.', form); return; }
@@ -217,7 +216,7 @@
       // Always refresh the public feed after a successful submission. The server remains
       // the source of truth and only returns wishes for which publication consent was given.
       await loadWishes();
-      if (payload.publish_message && payload.message) {
+      if (payload.message) {
         var track = query('[data-rw-wishes-track]');
         if (track) track.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
@@ -243,18 +242,11 @@
     all('[type="submit"]', form).forEach(function (button) { button.disabled = false; });
     setText('#wishSubmitLabel', 'Kirim doa & konfirmasi');
     all('.form-note', form).forEach(function (note) {
-      if (/perangkat|browser|mode lokal|mode demo|versi demo|pratinjau formulir/i.test(note.textContent)) {
-        note.textContent = 'Konfirmasi dikirim kepada mempelai. Ucapan ditampilkan di undangan hanya jika Anda menyetujuinya.';
+      if (/perangkat|browser|mode lokal|mode demo|versi demo|pratinjau formulir|ucapan ditampilkan di undangan hanya jika/i.test(note.textContent)) {
+        note.textContent = 'Konfirmasi dan ucapan akan tersimpan pada undangan ini.';
       }
     });
-    var label = document.createElement('label'); label.className = 'form-note';
-    label.style.cssText = 'display:flex;align-items:flex-start;gap:10px;margin:14px 0;font-size:13px;line-height:1.6;text-transform:none;letter-spacing:normal';
-    var checkbox = document.createElement('input'); checkbox.type = 'checkbox'; checkbox.name = 'publish_message';
-    checkbox.style.cssText = 'width:16px;height:16px;min-height:16px;flex:0 0 16px;margin-top:3px';
-    var text = document.createElement('span'); text.textContent = 'Saya bersedia nama dan ucapan saya ditampilkan pada undangan ini.';
-    label.append(checkbox, text);
-    var submit = query('[type="submit"]', form);
-    if (submit) submit.parentNode.insertBefore(label, submit); else form.appendChild(label);
+    // Guest messages are public on this invitation by design; no extra consent checkbox is shown.
     all('#clearWishes, #clearLocal, #downloadRsvp, #savedRsvp, #wishPaginationWrap').forEach(function (el) { el.hidden = true; });
     var message = query('textarea', form);
     if (message) message.addEventListener('input', function () { setText('#wishCharacters', message.value.length + ' / ' + message.maxLength); });

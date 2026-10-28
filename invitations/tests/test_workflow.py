@@ -154,7 +154,7 @@ class WorkflowTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("'=HYPERLINK(x)", response.content.decode())
 
-    def test_rsvp_persists_and_public_wishes_require_consent(self):
+    def test_rsvp_persists_and_public_wishes_publish_without_extra_consent_checkbox(self):
         self.invitation.status = Invitation.Status.PUBLISHED
         self.invitation.save()
         url = reverse("invitations:rsvp", args=[self.invitation.slug])
@@ -162,9 +162,9 @@ class WorkflowTests(TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Attendance.objects.get().party_size, 2)
         wishes = reverse("invitations:wishes", args=[self.invitation.slug])
-        self.assertEqual(self.client.get(wishes).json()["wishes"], [])
-        self.client.post(url, {"name": "Iin", "attendance": "maybe", "party_size": 1, "message": "Selamat!", "publish_message": "true"})
-        self.assertEqual(len(self.client.get(wishes).json()["wishes"]), 1)
+        self.assertEqual([item["message"] for item in self.client.get(wishes).json()["wishes"]], ["Pesan pribadi"])
+        self.client.post(url, {"name": "Iin", "attendance": "maybe", "party_size": 1, "message": "Selamat!"})
+        self.assertEqual(len(self.client.get(wishes).json()["wishes"]), 2)
 
     def test_guestbook_history_is_persisted_and_isolated_per_invitation(self):
         self.invitation.status = Invitation.Status.PUBLISHED

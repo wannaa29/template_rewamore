@@ -120,6 +120,13 @@ class AttendanceForm(forms.ModelForm):
     def clean_party_size(self):
         return self.cleaned_data.get("party_size") or 1
 
+    def clean(self):
+        cleaned = super().clean()
+        # Public guestbook is part of the invitation experience. Publish any non-empty
+        # message on this invitation without requiring a separate checkbox.
+        cleaned["publish_message"] = bool((cleaned.get("message") or "").strip())
+        return cleaned
+
     def clean_website(self):
         if self.cleaned_data.get("website"):
             raise ValidationError("Permintaan tidak dapat diproses.")
