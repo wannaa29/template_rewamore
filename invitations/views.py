@@ -386,6 +386,6 @@ def rsvp(request, slug):
 @never_cache
 def wishes(request, slug):
     invitation = get_object_or_404(Invitation, slug=slug, status=Invitation.Status.PUBLISHED)
-    items = invitation.responses.filter(publish_message=True).exclude(message="")[:50]
+    items = invitation.responses.filter(publish_message=True).exclude(message="").order_by("-created_at", "-pk")
     return JsonResponse({"wishes": [{"name": item.name, "message": item.message, "attendance": item.attendance, "created_at": item.created_at.isoformat()} for item in items]})
 

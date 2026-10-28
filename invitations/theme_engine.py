@@ -285,7 +285,7 @@ def _compile(slug):
     for i, caption in enumerate(('Dalam satu doa','Dalam satu janji','Untuk selamanya'),1):
         runtime_fields.append((f'runtime_slide_caption_{i}', f'Keterangan slider {i}', 'text', caption))
     if slug in ('3','4'):
-        for i in range(1,4):
+        for i in range(1, (3 if slug == '3' else 4)):
             for suffix,label in [('bank','Nama bank'),('name','Nama pemilik rekening'),('number','Nomor rekening')]:
                 runtime_fields.append((f'runtime_gift_{i}_{suffix}',f'Rekening {i}: {label}','text',''))
     runtime['fields'] = [dict(key=key,label=label,type=kind,default=default,target='runtime') for key,label,kind,default in runtime_fields]
@@ -483,7 +483,7 @@ def render_invitation(invitation, request=None, guest_name='', preview=False):
         'calendarTitle':str(content.get('runtime_calendar_title',invitation.title)),
         'calendarLocation':str(content.get('runtime_calendar_location','')),
         'slides':[{'caption':str(content.get(f'runtime_slide_caption_{i}',f'Kenangan {i}'))} for i in range(1,4)],
-        'giftAccounts':[{part:str(content.get(f'runtime_gift_{i}_{part}','')) for part in ('bank','name','number')} for i in range(1,4)
+        'giftAccounts':[{part:str(content.get(f'runtime_gift_{i}_{part}','')) for part in ('bank','name','number')} for i in range(1,(3 if slug == '3' else 4))
             if content.get(f'runtime_gift_{i}_number')],
     }
     audio=soup.find('audio')
@@ -496,6 +496,40 @@ def render_invitation(invitation, request=None, guest_name='', preview=False):
         'rsvpUrl':f'/{invitation.slug}/rsvp/','wishesUrl':f'/{invitation.slug}/wishes/',
         'csrfToken':get_token(request) if request else '', 'preview':bool(preview), 'runtime':runtime,
     }
+    # Botanical Portrait uses two deliberately styled gift cards.
+    if slug == '3':
+        gift_cards = soup.select('.gift-account, .bank-card')
+        for extra_card in gift_cards[2:]:
+            extra_card.decompose()
+
+    # Keep the guestbook below the RSVP form while preserving each theme's form design.
+    rsvp_form = soup.select_one('#rsvpForm, #rsvp-form')
+    if rsvp_form:
+        guestbook = soup.new_tag('section', attrs={'class': 'rw-guestbook', 'aria-labelledby': 'rw-guestbook-title', 'data-rw-guestbook': 'true'})
+        heading = soup.new_tag('div', attrs={'class': 'rw-guestbook-heading'})
+        title_node = soup.new_tag('h3', id='rw-guestbook-title'); title_node.string = 'Ucapan & doa'
+        sub = soup.new_tag('p'); sub.string = 'Doa baik dari keluarga dan sahabat.'
+        heading.extend([title_node, sub])
+        track = soup.new_tag('div', attrs={'class': 'rw-wishes-track', 'data-rw-wishes-track': 'true', 'aria-live': 'polite'})
+        empty = soup.new_tag('p', attrs={'class': 'rw-wishes-empty'}); empty.string = 'Belum ada ucapan yang dibagikan.'
+        track.append(empty)
+        controls = soup.new_tag('div', attrs={'class': 'rw-wishes-controls'})
+        count = soup.new_tag('span', attrs={'data-rw-wishes-count': 'true'}); count.string = '0 ucapan'
+        view_all = soup.new_tag('button', attrs={'type': 'button', 'class': 'rw-wishes-all', 'data-rw-wishes-all': 'true'}); view_all.string = 'Lihat semua ucapan'
+        controls.extend([count, view_all]); guestbook.extend([heading, track, controls])
+        rsvp_form.insert_after(guestbook)
+        modal = soup.new_tag('div', attrs={'class': 'rw-wishes-modal', 'data-rw-wishes-modal': 'true', 'hidden': '', 'role': 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'rw-wishes-modal-title'})
+        dialog = soup.new_tag('div', attrs={'class': 'rw-wishes-dialog'})
+        modal_head = soup.new_tag('div', attrs={'class': 'rw-wishes-modal-head'})
+        modal_title = soup.new_tag('h2', id='rw-wishes-modal-title'); modal_title.string = 'Semua ucapan'
+        close = soup.new_tag('button', attrs={'type': 'button', 'class': 'rw-wishes-close', 'data-rw-wishes-close': 'true', 'aria-label': 'Tutup ucapan'}); close.string = '×'
+        modal_head.extend([modal_title, close])
+        list_node = soup.new_tag('div', attrs={'class': 'rw-wishes-list', 'data-rw-wishes-list': 'true'})
+        dialog.extend([modal_head, list_node]); modal.append(dialog); soup.body.append(modal)
+        if soup.head:
+            css_link = soup.new_tag('link', rel='stylesheet', href=static('studio/guestbook.css'))
+            soup.head.append(css_link)
+
     json_node=soup.new_tag('script',id='rewamore-data',type='application/json')
     json_node.string=json.dumps(data,ensure_ascii=False).replace('<','\\u003C').replace('>','\\u003E').replace('&','\\u0026')
     bridge=soup.new_tag('script',src=static('studio/invitation.js'))

@@ -89,6 +89,13 @@
     event.returnValue = '';
   });
   const preview = document.getElementById('invitation-preview');
+  // A saved section may change text, logo initials, or navigation labels while the iframe URL stays the same.
+  // Force a fresh preview document on editor load instead of relying on browser iframe cache behavior.
+  if (preview && preview.src) {
+    const freshPreview = new URL(preview.src, window.location.origin);
+    freshPreview.searchParams.set('refresh', Date.now().toString());
+    preview.src = freshPreview.toString();
+  }
   document.querySelectorAll('[data-reload-preview]').forEach(button => {
     button.addEventListener('click', () => {
       if (preview) {

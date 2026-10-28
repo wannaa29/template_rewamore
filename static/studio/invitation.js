@@ -70,6 +70,18 @@
     if (event.target && event.target.tagName === 'IMG') imageFallback(event.target);
   }, true);
 
+  function setupBranding() {
+    // Initials are rendered from the saved, theme-specific content by the server.
+    // Do not replace them with derived initials here: clients may have chosen custom monograms.
+    // Apply only safe wrapping so long names cannot force the layout beyond a phone viewport.
+    all('h1, h2, h3, .name, .names, .couple, .couple-name, .hero-names, .groom-name, .bride-name, [data-guest]').forEach(function (node) {
+      if (node.closest('form, nav, button, .rw-guestbook')) return;
+      node.style.overflowWrap = 'anywhere';
+      node.style.wordBreak = 'normal';
+      node.style.maxWidth = '100%';
+    });
+  }
+
   function setupGuest() {
     all('[data-guest], #guestName:not(input), .guest-name').forEach(function (el) { el.textContent = guest; });
     all('#rsvpName, #rsvp-name, input#guestName').forEach(function (el) {
@@ -228,40 +240,61 @@
     loadWishes();
   }
 
-  async function loadWishes() {
-    var container = query('#wishesList, #wishes-list');
-    if (!container) return;
-    if (data.preview) {
-      container.replaceChildren();
-      setText('#wishLoadStatus', 'Ucapan tamu ditampilkan setelah undangan diterbitkan.');
-      return;
+  var wishesCache = [], wishesTimer = 0;
+  function wishCard(wish, full) {
+    var card = document.createElement(full ? 'article' : 'button'); card.className = 'rw-wish-card';
+    if (!full) { card.type = 'button'; card.setAttribute('aria-label', 'Baca ucapan dari ' + String(wish.name || 'Tamu')); }
+    var name = document.createElement('strong'); name.textContent = String(wish.name || 'Tamu');
+    var message = document.createElement('p'); message.textContent = String(wish.message || '');
+    var date = new Date(wish.created_at || wish.createdAt), small = document.createElement('small');
+    small.textContent = Number.isFinite(date.getTime()) ? date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+    card.append(name, message, small); if (!full) card.addEventListener('click', openWishesModal); return card;
+  }
+  function renderWishes() {
+    var track = query('[data-rw-wishes-track]'), list = query('[data-rw-wishes-list]'), count = query('[data-rw-wishes-count]');
+    if (count) count.textContent = wishesCache.length + ' ucapan';
+    if (track) {
+      track.replaceChildren();
+      var latest = wishesCache.slice(0, 4);
+      if (!latest.length) { var empty = document.createElement('p'); empty.className = 'rw-wishes-empty'; empty.textContent = 'Belum ada ucapan yang dibagikan.'; track.append(empty); }
+      latest.forEach(function (wish) { track.append(wishCard(wish, false)); });
     }
+    if (list) { list.replaceChildren(); wishesCache.forEach(function (wish) { list.append(wishCard(wish, true)); }); }
+    window.clearInterval(wishesTimer);
+    if (wishesCache.length > 4 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      wishesTimer = window.setInterval(function () {
+        var trackNow = query('[data-rw-wishes-track]'); if (!trackNow || query('[data-rw-wishes-modal]:not([hidden])')) return;
+        var first = wishesCache.shift(); wishesCache.push(first);
+        var animation = trackNow.animate([{ opacity: 1, transform: 'translateX(0)' }, { opacity: .35, transform: 'translateX(-12px)' }], { duration: 220, easing: 'ease-in' });
+        animation.onfinish = renderWishes;
+      }, 5000);
+    }
+  }
+  function openWishesModal() {
+    var modal = query('[data-rw-wishes-modal]'); if (!modal) return;
+    modal.hidden = false; document.body.style.overflow = 'hidden';
+    var close = query('[data-rw-wishes-close]', modal); if (close) close.focus();
+  }
+  function closeWishesModal() { var modal = query('[data-rw-wishes-modal]'); if (modal) { modal.hidden = true; document.body.style.overflow = ''; } }
+  document.addEventListener('click', function (event) {
+    if (event.target.closest('[data-rw-wishes-all]')) openWishesModal();
+    if (event.target.closest('[data-rw-wishes-close]') || event.target.matches('[data-rw-wishes-modal]')) closeWishesModal();
+  });
+  document.addEventListener('keydown', function (event) { if (event.key === 'Escape') closeWishesModal(); });
+  async function loadWishes() {
+    if (data.preview) { renderWishes(); return; }
     if (!data.wishesUrl) return;
     try {
-      var response = await fetch(data.wishesUrl, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } });
+      var response = await fetch(data.wishesUrl, { credentials: 'same-origin', headers: { 'Accept': 'application/json' }, cache: 'no-store' });
       if (!response.ok) throw new Error('Tidak dapat memuat ucapan.');
-      var body = await response.json();
-      var wishes = Array.isArray(body.wishes) ? body.wishes : [];
-      var fragment = document.createDocumentFragment();
-      wishes.forEach(function (wish) {
-        var article = document.createElement('article'); article.className = 'wish-card wish-item';
-        var heading = document.createElement('h4'); heading.textContent = wish.name;
-        var p = document.createElement('p'); p.textContent = wish.message;
-        var small = document.createElement('small');
-        var date = new Date(wish.created_at || wish.createdAt);
-        small.textContent = Number.isFinite(date.getTime()) ? date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
-        article.append(heading, p, small); fragment.appendChild(article);
-      });
-      container.replaceChildren(fragment);
-      setText('#wishTotal, #wish-count', String(wishes.length));
+      var body = await response.json(); wishesCache = Array.isArray(body.wishes) ? body.wishes : []; renderWishes();
+      setText('#wishTotal, #wish-count', String(wishesCache.length));
+      var legacy = query('#wishesList, #wishes-list'); if (legacy) { legacy.replaceChildren(); legacy.hidden = true; }
       setText('#wishLoadStatus', '');
-      var empty = query('#wishEmpty');
-      if (empty) { empty.hidden = wishes.length > 0; empty.textContent = 'Belum ada ucapan yang dibagikan.'; }
-      else if (!wishes.length) { var p = document.createElement('p'); p.className = 'form-note'; p.textContent = 'Belum ada ucapan yang dibagikan.'; container.appendChild(p); }
     } catch (_) { setText('#wishLoadStatus', 'Ucapan belum dapat dimuat. Coba perbarui halaman.'); }
   }
 
-  function init() { setupGuest(); setupCountdown(); setupRSVP(); all('img[src]').forEach(function (img) { if (img.complete && !img.naturalWidth) imageFallback(img); }); }
+  function init() { setupBranding(); setupGuest(); setupCountdown(); setupRSVP(); all('img[src]').forEach(function (img) { if (img.complete && !img.naturalWidth) imageFallback(img); }); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true }); else init();
   window.RewamoreRuntime.calendarText = calendarText;
 })();
