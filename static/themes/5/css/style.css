@@ -46,7 +46,7 @@ html.motion-off{scroll-behavior:auto}html.motion-off *,html.motion-off *:before,
   .rsvp-section>.rsvp-form{grid-column:2;grid-row:1 / span 2;width:100%;max-width:490px;margin:0;align-self:start}
   .rsvp-section>.rw-guestbook{grid-column:1;grid-row:2;width:100%;max-width:none;margin:0;padding:clamp(20px,2.4vw,34px);align-self:start}
   .rsvp-section>.prayer-book{display:none!important}
-  .rsvp-section .rw-wishes-track{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .rsvp-section .rw-wishes-track{display:flex}
 }
 @media (max-width:900px){
   .rsvp-section{display:block}
@@ -62,7 +62,7 @@ html.motion-off{scroll-behavior:auto}html.motion-off *,html.motion-off *:before,
   .cover-main h1{font-size:clamp(2.35rem,10vw,3.35rem);line-height:1.06;letter-spacing:-.04em;margin-inline:auto;max-width:100%}
   .cover-main h1>span{font-size:.6em;margin-inline:.04em}
   .rw-guestbook{padding:18px!important;border-radius:14px!important}
-  .rsvp-section .rw-wishes-track{grid-template-columns:minmax(0,1fr)!important}
+  .rsvp-section .rw-wishes-track{display:flex!important}
   .rw-wish-card{padding:14px}
-  .rw-wishes-controls{align-items:flex-start;flex-direction:column}
+  .rw-wishes-controls{align-items:center;justify-content:center;flex-direction:row;flex-wrap:wrap}
 }

@@ -519,16 +519,16 @@ def render_invitation(invitation, request=None, guest_name='', preview=False):
         rsvp_form = next((form for form in soup.find_all('form') if any(token in ' '.join(form.get('class', [])).lower() for token in ('rsvp', 'wish', 'ucapan'))), None)
     if rsvp_form:
         # Hide legacy, theme-native guestbooks so there is one consistent persisted feed.
-        for legacy in soup.select('#prayerBook, #wishesList, #wishPaginationWrap, .prayer-book, .legacy-guestbook, [data-legacy-guestbook]'):
+        for legacy in soup.select('#prayerBook, #wishesList, #wishPaginationWrap, #wishEmpty, .wishes-heading, .prayer-book, .legacy-guestbook, [data-legacy-guestbook]'):
             legacy['hidden'] = ''
             legacy['aria-hidden'] = 'true'
             legacy['style'] = (legacy.get('style', '') + ';display:none!important;')
 
-        page = soup.new_tag('section', attrs={'id': 'rw-guestbook-page', 'class': 'rw-guestbook-page section-pad section-anchor', 'aria-labelledby': 'rw-guestbook-title', 'data-rw-guestbook-page': 'true'})
-        guestbook = soup.new_tag('div', attrs={'class': 'rw-guestbook', 'data-rw-guestbook': 'true'})
+        page = soup.new_tag('section', attrs={'id': 'rw-guestbook-page', 'class': 'rw-guestbook-page section-pad section-anchor', 'aria-labelledby': 'rw-guestbook-title', 'data-rw-guestbook-page': 'true', 'data-rw-theme-slug': slug})
+        guestbook = soup.new_tag('div', attrs={'class': 'rw-guestbook', 'data-rw-guestbook': 'true', 'data-rw-theme-slug': slug})
         heading = soup.new_tag('div', attrs={'class': 'rw-guestbook-heading'})
         eyebrow = soup.new_tag('p', attrs={'class': 'rw-guestbook-eyebrow'}); eyebrow.string = 'DOA DARI KELUARGA & SAHABAT'
-        title_node = soup.new_tag('h2', id='rw-guestbook-title'); title_node.string = 'Ucapan & doa'
+        title_node = soup.new_tag('h2', id='rw-guestbook-title'); title_node.string = 'Words of love.'
         sub = soup.new_tag('p'); sub.string = 'Setiap doa tersimpan di halaman undangan ini.'
         heading.extend([eyebrow, title_node, sub])
         slider = soup.new_tag('div', attrs={'class': 'rw-wishes-slider', 'data-rw-wishes-slider': 'true'})
@@ -547,7 +547,7 @@ def render_invitation(invitation, request=None, guest_name='', preview=False):
             rsvp_section.insert_after(page)
         else:
             rsvp_form.insert_after(page)
-        modal = soup.new_tag('div', attrs={'class': 'rw-wishes-modal', 'data-rw-wishes-modal': 'true', 'hidden': '', 'role': 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'rw-wishes-modal-title'})
+        modal = soup.new_tag('div', attrs={'class': 'rw-wishes-modal', 'data-rw-wishes-modal': 'true', 'data-rw-theme-slug': slug, 'hidden': '', 'role': 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'rw-wishes-modal-title'})
         dialog = soup.new_tag('div', attrs={'class': 'rw-wishes-dialog'})
         modal_head = soup.new_tag('div', attrs={'class': 'rw-wishes-modal-head'})
         modal_title = soup.new_tag('h2', id='rw-wishes-modal-title'); modal_title.string = 'Semua ucapan'
