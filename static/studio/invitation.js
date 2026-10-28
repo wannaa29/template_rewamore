@@ -180,9 +180,21 @@
     if (!form.matches('#rsvpForm, #rsvp-form')) return;
     event.preventDefault(); event.stopImmediatePropagation();
     if (pending.has(form)) return;
-    if (data.preview) { status('Ini pratinjau. Konfirmasi dapat dikirim melalui tautan undangan yang sudah diterbitkan.', form); return; }
     if (!form.reportValidity()) return;
     var payload = payloadFor(form);
+    // Editor previews are intentionally not persisted. Simulate the submission locally
+    // so the owner can verify the complete RSVP + published-wish experience before launch.
+    if (data.preview) {
+      if (!payload.name || !payload.attendance) { status('Lengkapi nama dan pilihan kehadiran Anda.', form); return; }
+      if (payload.message && payload.publish_message) {
+        wishesCache.unshift({ name: payload.name, message: payload.message, attendance: payload.attendance, created_at: new Date().toISOString(), preview: true });
+        renderWishes();
+      }
+      status(payload.message && payload.publish_message
+        ? 'Pratinjau berhasil: ucapan ditampilkan sementara dan belum disimpan ke undangan publik.'
+        : 'Pratinjau berhasil: konfirmasi tidak disimpan. Centang persetujuan publikasi agar ucapan terlihat.', form);
+      return;
+    }
     if (!payload.name || !payload.attendance) { status('Lengkapi nama dan pilihan kehadiran Anda.', form); return; }
     pending.add(form);
     var buttons = all('[type="submit"]', form);
@@ -202,7 +214,13 @@
         throw new Error(errors || result.message || 'Konfirmasi belum tersimpan. Coba kembali.');
       }
       status(result.message || 'Terima kasih. Konfirmasi Anda telah tersimpan.', form);
-      if (payload.publish_message) loadWishes();
+      // Always refresh the public feed after a successful submission. The server remains
+      // the source of truth and only returns wishes for which publication consent was given.
+      await loadWishes();
+      if (payload.publish_message && payload.message) {
+        var track = query('[data-rw-wishes-track]');
+        if (track) track.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
     } catch (error) {
       status(error.name === 'AbortError' ? 'Koneksi terputus. Periksa jaringan dan coba kembali.' : error.message || 'Konfirmasi belum terkirim. Coba kembali.', form);
     } finally {
@@ -287,7 +305,11 @@
     try {
       var response = await fetch(data.wishesUrl, { credentials: 'same-origin', headers: { 'Accept': 'application/json' }, cache: 'no-store' });
       if (!response.ok) throw new Error('Tidak dapat memuat ucapan.');
-      var body = await response.json(); wishesCache = Array.isArray(body.wishes) ? body.wishes : []; renderWishes();
+      var body = await response.json();
+      // Preserve temporary preview-only entries; never mix them into a published invitation.
+      var previewItems = data.preview ? wishesCache.filter(function (wish) { return wish.preview; }) : [];
+      wishesCache = previewItems.concat(Array.isArray(body.wishes) ? body.wishes : []);
+      renderWishes();
       setText('#wishTotal, #wish-count', String(wishesCache.length));
       var legacy = query('#wishesList, #wishes-list'); if (legacy) { legacy.replaceChildren(); legacy.hidden = true; }
       setText('#wishLoadStatus', '');

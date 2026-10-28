@@ -1,17 +1,12 @@
-# Catatan Revisi Rewamore
+# Catatan Revisi 3
 
-## Perubahan
-- Memastikan preview editor memakai URL dengan cache-buster saat halaman editor dibuka, sehingga perubahan yang sudah disimpan tidak bergantung pada cache iframe.
-- Mempertahankan monogram yang disimpan pada konten tema; runtime tidak lagi menimpa monogram pilihan klien dengan inisial nama otomatis.
-- Menambahkan aturan responsive bersama untuk membungkus nama panjang dan mencegah judul pasangan melebar keluar layar pada perangkat mobile.
-- Menambahkan komponen ucapan bersama di bawah formulir RSVP pada seluruh tema yang memiliki formulir RSVP.
-- Komponen ucapan menampilkan empat ucapan terbaru, berotasi otomatis dari kanan ke kiri jika jumlah ucapan lebih dari empat, dan membuka modal berisi seluruh ucapan ketika kartu atau tombol “Lihat semua ucapan” dipilih.
-- Ucapan hanya dimuat dari kiriman yang menyetujui publikasi. Data ucapan ditampilkan menggunakan textContent agar teks tamu tidak dieksekusi sebagai HTML.
-- Tema 3 menggunakan maksimal dua rekening hadiah pada konfigurasi runtime dan editor.
-- Endpoint ucapan mengembalikan seluruh ucapan publik, bukan membatasi daftar menjadi 50 item.
+## Perbaikan tambahan berdasarkan screenshot
+- RSVP pada mode preview kini dapat diuji secara lokal. Ucapan yang menyetujui publikasi muncul sementara di kartu ucapan, tetapi tidak dikirim/disimpan ke server sampai undangan publik digunakan.
+- Setelah RSVP berhasil pada undangan publik, daftar ucapan dimuat ulang dan sumber data tetap endpoint server yang hanya menampilkan ucapan dengan persetujuan publikasi.
+- Template 5 pada desktop menggunakan layout dua kolom: judul dan daftar ucapan mengisi area kiri, formulir RSVP berada di kanan. Daftar ucapan tidak lagi menumpuk panjang di bawah formulir.
+- Pada mobile, judul pasangan di sampul dapat membungkus ke beberapa baris dan tidak lagi dipaksa satu baris sehingga terpotong. Daftar ucapan berubah menjadi satu kolom pada layar sempit.
+- Bagian buku doa lama disembunyikan pada Template 5 agar tidak menduplikasi daftar ucapan baru.
 
-## Pemeriksaan
-- Pemeriksaan sintaks Python (`compileall`) berhasil.
-- Pemeriksaan sintaks JavaScript dengan `node --check` berhasil untuk runtime undangan dan studio.
-- Pemeriksaan struktur HTML statis memastikan kesepuluh sumber tema memiliki formulir RSVP.
-- Pemeriksaan Django end-to-end belum dapat dijalankan di lingkungan ini karena paket Django tidak tersedia di runtime. Jalankan `pip install -r requirements.txt`, kemudian `python manage.py check` dan tes proyek sebelum deploy.
+## Validasi
+- Perlu menjalankan `python manage.py check` dan tes proyek pada environment dengan dependensi yang terpasang.
+- Ucapan pada preview adalah simulasi lokal; untuk penyimpanan permanen, pengujian dilakukan melalui undangan berstatus terbit.

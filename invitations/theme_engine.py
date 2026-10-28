@@ -162,7 +162,10 @@ def _compile(slug):
 
     ensure_group('metadata', 'Judul halaman & pratinjau tautan')
     for node in soup.find_all(True):
-        if node.name in ('section','footer','dialog') or node.get('id') in ('cover', 'openingDialog') or (node.name == 'aside' and 'desktop-panel' in node.get('class', [])):
+        # Theme 5's desktop-only left/right story panel lives in an <aside>,
+        # not a <section>. Give it its own editor section so its hero photo is
+        # discoverable and replaceable instead of being buried in general fields.
+        if node.name in ('section','footer','dialog') or node.get('id') in ('cover', 'openingDialog') or (node.name == 'aside' and any(cls in node.get('class', []) for cls in ('desktop-panel', 'desktop-story'))):
             token = node.get('id') or ('footer' if node.name == 'footer' else next(iter(node.get('class', [])), 'bagian'))
             key = re.sub(r'[^a-z0-9]+', '-', token.lower()).strip('-')
             base = key

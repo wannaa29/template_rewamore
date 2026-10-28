@@ -100,3 +100,26 @@ class ThemeRenderingTests(SimpleTestCase):
         inv=self.invitation('6')
         soup=BeautifulSoup(render_invitation(inv),'html.parser')
         self.assertTrue(all(option.has_attr('value') for option in soup.select('select option')))
+
+
+class Theme5DesktopPhotoSchemaTests(SimpleTestCase):
+    def test_theme_5_desktop_story_photo_is_editable_in_own_section(self):
+        schema = get_theme_schema('5')
+        panel = next(section for section in schema['sections'] if section['key'] == 'desktop-story')
+        photo = next(field for field in panel['fields'] if field.get('target') == 'image')
+        self.assertEqual(photo['type'], 'image')
+        self.assertTrue(photo['default'].endswith('img/couple-close-960.webp'))
+
+    def test_custom_desktop_story_photo_replaces_responsive_default(self):
+        theme = SimpleNamespace(slug='5', schema=get_theme_schema('5'))
+        content = initial_content(theme, 'Riswan', 'Iin')
+        panel = next(section for section in theme.schema['sections'] if section['key'] == 'desktop-story')
+        field = next(field for field in panel['fields'] if field.get('target') == 'image')
+        content[field['key']] = '/media/invitations/custom-desktop.webp'
+        inv = SimpleNamespace(pk=1, theme=theme, content=content, sections={},
+            groom_name='Riswan', bride_name='Iin', slug='riswan-dan-iin',
+            title='Riswan dan Iin', event_date=None)
+        soup = BeautifulSoup(render_invitation(inv, guest_name='Tamu'), 'html.parser')
+        photo = soup.select_one('img.desktop-photo')
+        self.assertEqual(photo.get('data-src'), '/media/invitations/custom-desktop.webp')
+        self.assertNotIn('data-srcset', photo.attrs)

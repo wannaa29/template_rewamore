@@ -37,3 +37,32 @@ dialog{border:0;color:var(--ink);font:inherit}dialog::backdrop{background:#302c2
 @media(max-width:360px){.hero-heading h2{font-size:48px;white-space:normal}.cover-main h1{font-size:47px;white-space:normal}.cover-main h1>span{margin-inline:1px}}
 .js .hero-slide[data-src]{transition:opacity 1.8s ease}.lightbox-stage img.is-error{opacity:.25;object-fit:contain}
 html.motion-off{scroll-behavior:auto}html.motion-off *,html.motion-off *:before,html.motion-off *:after{animation:none!important;transition-duration:.01ms!important;transition-delay:0ms!important}html.motion-off [data-reveal]{opacity:1;transform:none;clip-path:none}html.motion-off .hero-slide{transform:none!important}html.motion-off .hero-scroll>span:last-child{transform:none}
+
+
+/* Revision: balanced RSVP layout and uncropped mobile cover names. */
+@media (min-width: 901px){
+  .rsvp-section{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.92fr);column-gap:clamp(28px,4vw,64px);row-gap:26px;align-items:start}
+  .rsvp-section>.section-heading{grid-column:1;grid-row:1;margin:0 0 6px;align-self:start}
+  .rsvp-section>.rsvp-form{grid-column:2;grid-row:1 / span 2;width:100%;max-width:490px;margin:0;align-self:start}
+  .rsvp-section>.rw-guestbook{grid-column:1;grid-row:2;width:100%;max-width:none;margin:0;padding:clamp(20px,2.4vw,34px);align-self:start}
+  .rsvp-section>.prayer-book{display:none!important}
+  .rsvp-section .rw-wishes-track{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:900px){
+  .rsvp-section{display:block}
+  .rsvp-section>.section-heading,.rsvp-section>.rsvp-form,.rsvp-section>.rw-guestbook{width:100%;max-width:100%}
+  .rsvp-section>.rw-guestbook{margin:28px auto 0}
+  .rsvp-section>.prayer-book{display:none!important}
+  .cover-main h1{white-space:normal!important;overflow-wrap:anywhere;text-wrap:balance;font-size:clamp(2.55rem,10.5vw,4rem);line-height:1.04;letter-spacing:-.045em;max-width:100%;padding-inline:2px}
+  .cover-main h1>span{display:inline-block;vertical-align:baseline;font-size:.62em;margin-inline:.08em;white-space:nowrap}
+  .cover-letter{min-width:0;overflow:hidden}
+}
+@media (max-width:480px){
+  .cover-main{width:100%;min-width:0}
+  .cover-main h1{font-size:clamp(2.35rem,10vw,3.35rem);line-height:1.06;letter-spacing:-.04em;margin-inline:auto;max-width:100%}
+  .cover-main h1>span{font-size:.6em;margin-inline:.04em}
+  .rw-guestbook{padding:18px!important;border-radius:14px!important}
+  .rsvp-section .rw-wishes-track{grid-template-columns:minmax(0,1fr)!important}
+  .rw-wish-card{padding:14px}
+  .rw-wishes-controls{align-items:flex-start;flex-direction:column}
+}
