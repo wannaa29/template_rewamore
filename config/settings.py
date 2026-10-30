@@ -32,8 +32,29 @@ if not SECRET_KEY:
 if not DEBUG and len(SECRET_KEY) < 50:
     raise ImproperlyConfigured('Gunakan SECRET_KEY acak minimal 50 karakter.')
 
-ALLOWED_HOSTS = [x.strip() for x in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,[::1]').split(',') if x.strip()]
-CSRF_TRUSTED_ORIGINS = [x.strip().rstrip('/') for x in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if x.strip()]
+ALLOWED_HOSTS = []
+for host in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,template.rewamore.my.id,www.template.rewamore.my.id,[::1]').split(','):
+    host = host.strip()
+    if not host:
+        continue
+    if '://' in host:
+        from urllib.parse import urlsplit
+        host = urlsplit(host).hostname or host
+    if host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(host)
+
+raw_origins = os.getenv('CSRF_TRUSTED_ORIGINS')
+if raw_origins is None:
+    raw_origins = 'https://template.rewamore.my.id,https://www.template.rewamore.my.id'
+CSRF_TRUSTED_ORIGINS = []
+for origin in raw_origins.split(','):
+    origin = origin.strip().rstrip('/')
+    if not origin:
+        continue
+    if '://' not in origin:
+        origin = f'https://{origin}'
+    if origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(origin)
 PUBLIC_BASE_URL = os.getenv('PUBLIC_BASE_URL', '').strip().rstrip('/')
 if PUBLIC_BASE_URL:
     from urllib.parse import urlsplit
